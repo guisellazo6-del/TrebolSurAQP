@@ -1,0 +1,2490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Trébol Sur — Control de Vales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0; --card: #ffffff; --dark: #1a1a2e; --amber: #e8a500; --amber-l: #fff3cc;
+  --red: #d93025; --green: #1e8c45; --blue: #1565c0; --border: #e2e0d8;
+  --text-1: #1a1a2e; --text-2: #5a5870; --text-3: #9997b0;
+  --radius: 12px; --shadow: 0 2px 12px rgba(26,26,46,.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-1); min-height: 100vh; }
+.mono { font-family: 'DM Mono', monospace; }
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); }
+.login-card { background: var(--card); border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 420px; box-shadow: 0 24px 48px rgba(0,0,0,.3); }
+.login-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+.login-brand { font-size: 20px; font-weight: 700; color: var(--dark); }
+.login-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.rol-selector { display: flex; gap: 6px; margin-bottom: 22px; background: var(--bg); border-radius: 10px; padding: 4px; flex-wrap: wrap; }
+.rol-opt { flex: 1; min-width: 80px; text-align: center; padding: 9px 6px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-2); transition: all .18s; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.rol-opt.active { background: var(--dark); color: #fff; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+.form-group select, .form-group input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text-1); outline: none; transition: border-color .15s; }
+.form-group select:focus, .form-group input:focus { border-color: var(--dark); background: #fff; }
+.btn { padding: 11px 20px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
+.btn-primary { background: var(--dark); color: #fff; }
+.btn-primary:hover { background: #2d2d4e; }
+.btn-full { width: 100%; margin-top: 8px; }
+.btn-amber { background: var(--amber); color: #fff; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text-1); }
+.btn-blue { background: var(--blue); color: #fff; }
+#login-msg { min-height: 20px; font-size: 13px; color: var(--red); text-align: center; margin-bottom: 6px; }
+.header { background: var(--dark); color: #fff; padding: 0 16px; height: 58px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-title { font-weight: 700; font-size: 15px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.header-user { font-size: 12px; color: rgba(255,255,255,.7); }
+.badge { background: var(--amber); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+.btn-logout { background: rgba(255,255,255,.12); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 600; }
+.nav-bar { display: flex; gap: 0; background: var(--card); border-bottom: 2px solid var(--border); overflow-x: auto; padding: 0 12px; }
+.nav-item { padding: 14px 14px 12px; font-size: 13px; font-weight: 600; color: var(--text-2); cursor: pointer; white-space: nowrap; border-bottom: 2.5px solid transparent; margin-bottom: -2px; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.nav-item:hover { color: var(--text-1); }
+.nav-item.active { color: var(--dark); border-bottom-color: var(--dark); }
+.nav-item .walkie-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.main-content { padding: 16px; max-width: 960px; margin: 0 auto; }
+.card { background: var(--card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+.card-title { font-size: 14px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 16px; }
+.section-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+.tag-evit { background: #dbeafe; color: #1e40af; }
+.tag-avia { background: #d1fae5; color: #065f46; }
+.tag-plan { background: #fce7f3; color: #831843; }
+.tag-kia  { background: #ede9fe; color: #5b21b6; }
+.tag-niss { background: #fee2e2; color: #991b1b; }
+.tag-chev { background: #fef3c7; color: #92400e; }
+.tag-hyun { background: #e0f7fa; color: #006064; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { font-size: 11px; font-weight: 700; color: var(--text-2); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border); text-transform: uppercase; letter-spacing: .3px; }
+td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+.table-wrap { overflow-x: auto; }
+.form-row { display: grid; gap: 12px; margin-bottom: 12px; }
+.form-row-2 { grid-template-columns: 1fr 1fr; }
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row-1 { grid-template-columns: 1fr; }
+.fld label { display: block; font-size: 11px; font-weight: 700; color: var(--text-2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
+.fld input, .fld select, .fld textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text-1); outline: none; transition: border-color .15s; }
+.fld input:focus, .fld select:focus { border-color: var(--dark); background: #fff; }
+.fld .hint { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+.costo-display { background: var(--dark); color: var(--amber); padding: 14px 16px; border-radius: 10px; text-align: center; margin-bottom: 16px; }
+.costo-display .label { font-size: 11px; opacity: .7; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.costo-display .valor { font-size: 28px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.costo-empresa-display { background: var(--amber-l); border: 1.5px solid var(--amber); color: #92400e; padding: 10px 16px; border-radius: 10px; text-align: center; margin-bottom: 16px; font-size: 12px; font-weight: 600; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.stat-label { font-size: 11px; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+.stat-val { font-size: 24px; font-weight: 700; }
+.error-chip { background: #fee2e2; color: var(--red); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+.ok-chip { background: #d1fae5; color: var(--green); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+.alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 12px; }
+.alert-amber { background: var(--amber-l); border: 1px solid var(--amber); color: #92400e; }
+.alert-red { background: #fee2e2; border: 1px solid #fca5a5; color: var(--red); }
+.alert-green { background: #d1fae5; border: 1px solid #6ee7b7; color: var(--green); }
+.alert-blue { background: #dbeafe; border: 1px solid #93c5fd; color: #1e40af; }
+/* Walkie */
+.wt-wrap { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.wt-device { background: linear-gradient(145deg, #2a2a3e, #1a1a2e); border-radius: 24px; padding: 24px; width: 100%; max-width: 340px; box-shadow: 0 8px 32px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.08); }
+.wt-screen { background: #0a0a14; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: center; font-family: 'DM Mono', monospace; border: 1px solid #333; }
+.wt-screen .wt-channel { font-size: 11px; color: #4ade80; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+.wt-screen .wt-status { font-size: 16px; color: #e8c547; font-weight: 700; }
+.wt-screen .wt-user { font-size: 12px; color: #888; margin-top: 4px; }
+.wt-visualizer { height: 48px; background: #0a0a14; border-radius: 8px; margin-bottom: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 3px; padding: 0 8px; }
+.wt-bar { width: 4px; border-radius: 2px; background: #4ade80; transition: height .1s; }
+.ptt-btn { width: 100%; padding: 20px; background: linear-gradient(145deg, #c53030, #9b1c1c); color: #fff; border: none; border-radius: 16px; font-size: 18px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px rgba(197,48,48,.4); transition: all .1s; display: flex; align-items: center; justify-content: center; gap: 10px; user-select: none; -webkit-user-select: none; }
+.ptt-btn:active, .ptt-btn.transmitting { background: linear-gradient(145deg, #e53e3e, #c53030); transform: scale(.97); }
+.ptt-btn.transmitting { animation: ptt-pulse .5s infinite; }
+@keyframes ptt-pulse { 0%,100%{box-shadow:0 2px 8px rgba(197,48,48,.6)} 50%{box-shadow:0 4px 20px rgba(197,48,48,.9)} }
+.wt-msgs { background: #0a0a14; border-radius: 10px; padding: 10px; margin-bottom: 12px; min-height: 80px; max-height: 160px; overflow-y: auto; }
+.wt-msg { font-size: 12px; padding: 4px 0; border-bottom: 1px solid #1a1a2e; color: #aaa; display: flex; gap: 6px; }
+.wt-msg:last-child { border-bottom: none; }
+.wt-msg .wt-from { color: #e8c547; font-weight: 700; min-width: 80px; }
+.wt-msg.own .wt-from { color: #4ade80; }
+.wt-channel-select { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.ch-btn { flex: 1; padding: 8px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: #aaa; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; text-align: center; }
+.ch-btn.active { background: rgba(232,197,71,.2); border-color: var(--amber); color: var(--amber); }
+.wt-info { font-size: 11px; color: var(--text-3); text-align: center; margin-top: 8px; }
+/* Admin panel */
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.movimiento-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 8px; }
+.movimiento-row:last-child { border-bottom: none; }
+.monto-positivo { color: var(--green); font-weight: 700; }
+.monto-negativo { color: var(--red); font-weight: 700; }
+.monto-neutro { color: var(--blue); font-weight: 700; }
+.chip-ingreso { background: #d1fae5; color: var(--green); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.chip-adelanto { background: #fee2e2; color: var(--red); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.chip-gasto { background: #fef3c7; color: #92400e; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.chip-deposito { background: #dbeafe; color: var(--blue); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.saldo-box { border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 16px; }
+.saldo-box.positivo { background: linear-gradient(135deg, #1e8c45, #16a34a); color: #fff; }
+.saldo-box.negativo { background: linear-gradient(135deg, #d93025, #b91c1c); color: #fff; }
+.saldo-box.neutro   { background: linear-gradient(135deg, #1565c0, #1d4ed8); color: #fff; }
+.saldo-label { font-size: 11px; opacity: .8; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.saldo-val { font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.saldo-sub { font-size: 11px; opacity: .75; margin-top: 4px; }
+.vale-card { border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+.vale-card.has-error { border-color: var(--red); background: #fff8f8; }
+.vale-card.editado { border-color: var(--amber); }
+.vale-meta { font-size: 11px; color: var(--text-3); display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-3); }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+/* N° vale auto highlight */
+.nvale-auto { background: #d1fae5; border-color: var(--green) !important; }
+@media (max-width: 600px) {
+  .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
+  .main-content { padding: 12px; }
+  .login-card { padding: 28px 20px; }
+  .admin-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="12" fill="#1a1a2e"/>
+        <path d="M7 24l4-9h18l4 9H7z" fill="#e8c547" opacity=".9"/>
+        <rect x="9" y="24" width="22" height="7" rx="2.5" fill="#e8c547"/>
+        <circle cx="13.5" cy="31" r="2.8" fill="#1a1a2e"/>
+        <circle cx="26.5" cy="31" r="2.8" fill="#1a1a2e"/>
+        <rect x="17" y="15" width="6" height="5" rx="1" fill="#1a1a2e" opacity=".45"/>
+      </svg>
+      <div>
+        <div class="login-brand">Trébol Sur SAC</div>
+        <div class="login-sub">Control de Vales · Perumotor SAC</div>
+      </div>
+    </div>
+    <div class="rol-selector">
+      <div class="rol-opt active" id="btn-conductor" onclick="selectRol('conductor')">🚗 Conductor</div>
+      <div class="rol-opt" id="btn-moderador" onclick="selectRol('moderador')">🛡️ Moderador</div>
+      <div class="rol-opt" id="btn-admin" onclick="selectRol('admin')">💼 Admin</div>
+    </div>
+    <div class="form-group">
+      <label>Nombre</label>
+      <select id="login-nombre"></select>
+    </div>
+    <div class="form-group">
+      <label>Contraseña (DNI o N° Carnet)</label>
+      <input type="password" id="login-pass" placeholder="Ingresa tu DNI o contraseña" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="login-msg"></div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Ingresar →</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main-screen" style="display:none">
+  <header class="header">
+    <div class="header-left">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="12" fill="#1a1a2e"/>
+        <path d="M7 24l4-9h18l4 9H7z" fill="#e8c547" opacity=".9"/>
+        <rect x="9" y="24" width="22" height="7" rx="2.5" fill="#e8c547"/>
+        <circle cx="13.5" cy="31" r="2.8" fill="#1a1a2e"/>
+        <circle cx="26.5" cy="31" r="2.8" fill="#1a1a2e"/>
+      </svg>
+      <span class="header-title">Trébol Sur · Vales</span>
+    </div>
+    <div class="header-right">
+      <span id="header-user" class="header-user"></span>
+      <span id="header-badge" class="badge" style="display:none"></span>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </header>
+  <nav class="nav-bar" id="nav-bar"></nav>
+  <main class="main-content" id="main-content"></main>
+</div>
+
+<script>
+// ============================================================
+//  DATOS USUARIOS
+// ============================================================
+// Contraseñas = DNI o N° Carnet de extranjería real
+const MOD_PASS = "46821973"; // Contraseña moderador — cambia por DNI real
+
+// ============================================================
+//  CONDUCTORES — pass = DNI o Carnet de extranjería
+//  Para cambiar una contraseña: edita el número entre comillas
+//  de la persona correspondiente y guarda el archivo.
+// ============================================================
+const CONDUCTORES = [
+  { id:1,  nombre:"Javier",      pass:"41523867" },  // ← reemplaza con DNI real
+  { id:2,  nombre:"Hernan",      pass:"43218756" },
+  { id:3,  nombre:"Cristian",    pass:"47836291" },
+  { id:4,  nombre:"Joseph",      pass:"44129875" },
+  { id:5,  nombre:"Augusto",     pass:"00000005" },  // ← PENDIENTE: poner DNI real
+  { id:6,  nombre:"Güisella",    pass:"00000006" },  // ← PENDIENTE: poner DNI real
+  { id:7,  nombre:"Ángel",       pass:"00000007" },  // ← PENDIENTE: poner DNI real
+  { id:8,  nombre:"Alfredo",     pass:"40987612" },
+  { id:9,  nombre:"Paolo Palma", pass:"45672318" },
+  { id:10, nombre:"Peter",       pass:"CE001234" },
+  { id:11, nombre:"Diego N.",    pass:"43981762" },
+  { id:12, nombre:"Gabino",      pass:"CE005678" },
+  { id:13, nombre:"Benjamin",    pass:"46123987" },
+  { id:14, nombre:"Robert",      pass:"44876213" },
+  { id:15, nombre:"Pedro N",     pass:"43217865" },
+  { id:16, nombre:"Giancarlo",   pass:"47321896" },
+  { id:17, nombre:"Jhon",        pass:"00000017" },  // ← PENDIENTE: poner DNI real
+  { id:18, nombre:"Junior",      pass:"00000018" },  // ← PENDIENTE: poner DNI real
+  { id:19, nombre:"Roberto P.",  pass:"45198763" },
+  { id:20, nombre:"Paulo",       pass:"00000020" },  // ← PENDIENTE: poner DNI real
+  { id:21, nombre:"Jackson",     pass:"00000021" },  // ← PENDIENTE: poner DNI real
+  { id:22, nombre:"Gonzalo",     pass:"00000022" },  // ← PENDIENTE: poner DNI real
+  { id:23, nombre:"Luis",        pass:"00000023" },  // ← PENDIENTE: poner DNI real
+  { id:24, nombre:"Julio",       pass:"00000024" },  // ← PENDIENTE: poner DNI real
+  { id:25, nombre:"Jose Luis",   pass:"00000025" },  // ← PENDIENTE: poner DNI real
+];
+
+// Administradores — acceden al panel de caja (Ángel, Augusto, Güisella)
+const ADMINS = [
+  { id:"angel",   nombre:"Ángel",    pass:"00000007" },  // ← misma pass que unidad 7
+  { id:"augusto", nombre:"Augusto",  pass:"00000005" },  // ← misma pass que unidad 5
+  { id:"guisella",nombre:"Güisella", pass:"00000006" },  // ← misma pass que unidad 6
+];
+
+// ============================================================
+//  REGLA: N° VALE → TALLER AUTOMÁTICO
+//  Último dígito del N° vale define el taller
+//  1=Evitamiento, 2=Taller 2 Kia, 3=Planchado, 4=Nissan, 5=Chevrolet
+//  (Cualquier otro dígito: selección manual)
+// ============================================================
+const VALE_TALLER_MAP = {
+  "1": "TALLER EVITAMIENTO MULTIMARCA",
+  "2": "Taller Kia",
+  "3": "Planchado",
+  "4": "Taller Nissan",
+  "5": "Taller Chevrolet",
+  "6": "Taller Hyundai",
+};
+
+// ============================================================
+//  TALLERES
+// ============================================================
+const TALLERES_INFO = {
+  "TALLER EVITAMIENTO MULTIMARCA": { origen:"VÍA DE EVITAMIENTO KM 3.9", empresa:"TS",  tag:"tag-evit", num:1 },
+  "Taller Kia":                    { origen:"TALLER KIA - AVIACIÓN",      empresa:"PM",  tag:"tag-kia",  num:2 },
+  "Planchado":                     { origen:"PLANCHADO",                  empresa:"PM",  tag:"tag-plan", num:3 },
+  "Taller Nissan":                 { origen:"TALLER NISSAN",              empresa:"PM",  tag:"tag-niss", num:4 },
+  "Taller Chevrolet":              { origen:"TALLER CHEVROLET",           empresa:"PM",  tag:"tag-chev", num:5 },
+  "Taller Hyundai":                { origen:"TALLER HYUNDAI AVIACIÓN",    empresa:"INC", tag:"tag-hyun", num:6 },
+};
+
+// ============================================================
+//  DESTINOS
+// ============================================================
+const DESTINOS_POR_TALLER = {
+  "Evitamiento": [
+    {num:1,  cod:"CC01",  dist:"CERRO COLORADO",    dest:"PLAZA LAS AMERICAS, PRIMAVERA, VERACRUZ",                 costoEmp:13, costoCond:12},
+    {num:2,  cod:"CC01",  dist:"CERRO COLORADO",    dest:"CAMPO VERDE, MONTE BELLO",                                costoEmp:13, costoCond:12},
+    {num:3,  cod:"CC01",  dist:"CERRO COLORADO",    dest:"DON GOYO, JARDIN DE AREQUIPA",                            costoEmp:13, costoCond:12},
+    {num:4,  cod:"CC02",  dist:"CERRO COLORADO",    dest:"AV. PERU, RICO POLLO",                                    costoEmp:14, costoCond:12},
+    {num:5,  cod:"CC02",  dist:"CERRO COLORADO",    dest:"CERRO VIEJO, ADUCA, AZORES, SOLAR DE CHALLAPAMPA",        costoEmp:14, costoCond:12},
+    {num:6,  cod:"CC02",  dist:"CERRO COLORADO",    dest:"AREQUIPA CENTER, QUINTA EL SOL, LA FONDA",                costoEmp:14, costoCond:12},
+    {num:7,  cod:"CC03",  dist:"CERRO COLORADO",    dest:"URB COLEGIO INGENIEROS, URB CHALLAPAMPA, LA PRADERA",     costoEmp:15, costoCond:13},
+    {num:8,  cod:"CC03",  dist:"CERRO COLORADO",    dest:"VILLA EL SOL, LA CASTELLANA, SOCOSANI, EL ROSARIO 1 Y 2",costoEmp:15, costoCond:13},
+    {num:9,  cod:"CC03",  dist:"CERRO COLORADO",    dest:"URB. MICHELL, LA TEJADA, LOS ALAMOS, LA MOLINA",          costoEmp:15, costoCond:13},
+    {num:10, cod:"CC04",  dist:"CERRO COLORADO",    dest:"12 DE OCTUBRE, CERRITO LOS ALVAREZ",                      costoEmp:16, costoCond:13},
+    {num:11, cod:"CC04",  dist:"CERRO COLORADO",    dest:"LAS BUGAMBILLAS, VALLE BLANCO, VILLA VERDE, IBARCENA",    costoEmp:16, costoCond:13},
+    {num:12, cod:"CC04",  dist:"CERRO COLORADO",    dest:"ZAMACOLA, V.A.BELAUNDE, VILLA CORPAC, RIO SECO",          costoEmp:16, costoCond:13},
+    {num:13, cod:"CC04",  dist:"CERRO COLORADO",    dest:"CITY CENTER, CLIN. SAN PABLO, PACHACUTEC VIEJO",          costoEmp:16, costoCond:13},
+    {num:14, cod:"CC04",  dist:"CERRO COLORADO",    dest:"ALTO LIBERTAD, MARISCAL CASTILLA, TUPAC AMARU",           costoEmp:16, costoCond:13},
+    {num:15, cod:"CC05",  dist:"CERRO COLORADO",    dest:"PLASTISUR",                                               costoEmp:17, costoCond:13},
+    {num:16, cod:"CC05",  dist:"CERRO COLORADO",    dest:"PLAZA NORTE, TERMINAL PESQUERO",                          costoEmp:17, costoCond:13.5},
+    {num:17, cod:"CC05",  dist:"CERRO COLORADO",    dest:"JOSE SANTOS ATAHUALPA, SEMI R. PACHACUTEC",               costoEmp:17, costoCond:15},
+    {num:18, cod:"CC06",  dist:"CERRO COLORADO",    dest:"VARIANTE DE UCHU, SUPER MIX, PQ INDUSTRIAL RIO SECO",     costoEmp:19, costoCond:16},
+    {num:19, cod:"CC07",  dist:"CERRO COLORADO",    dest:"VILLA PARAISO, LAS FLORES, FONTANA, AV 54, NAZARENO",     costoEmp:21, costoCond:18},
+    {num:20, cod:"CC07",  dist:"CERRO COLORADO",    dest:"ENTRADA MUNICIPAL, ENTRADA LLAMAGAS",                     costoEmp:21, costoCond:18},
+    {num:21, cod:"CC07",  dist:"CERRO COLORADO",    dest:"AEROPUERTO, PERU ARBO",                                   costoEmp:21, costoCond:18},
+    {num:22, cod:"CC08",  dist:"CERRO COLORADO",    dest:"CIUDAD MUNICIPAL, CERRILLOS",                             costoEmp:25, costoCond:22},
+    {num:23, cod:"CC08",  dist:"CERRO COLORADO",    dest:"SOR ANA DE LOS ANGELES, CERRILLOS",                      costoEmp:25, costoCond:22},
+    {num:24, cod:"YAN01", dist:"YANAHUARA",         dest:"PIEDRA SANTA, PRIMAVERA, AV METROPOLITANA",               costoEmp:20, costoCond:17},
+    {num:25, cod:"YAN01", dist:"YANAHUARA",         dest:"MAGISTERIAL III, JUAN XXIII, LOS CEDROS",                 costoEmp:20, costoCond:17},
+    {num:26, cod:"YAN01", dist:"YANAHUARA",         dest:"PZ YANAHUARA, AV. Y URB VICTOR A. BELAUNDE",              costoEmp:20, costoCond:17},
+    {num:27, cod:"YAN01", dist:"YANAHUARA",         dest:"ESTADIO UMACOLLO, HOSPITAL YANAHUARA",                    costoEmp:20, costoCond:17},
+    {num:28, cod:"YAN01", dist:"YANAHUARA",         dest:"PUENTE FATIMA, UNIV. CATOLICA, UMACOLLO",                 costoEmp:20, costoCond:17},
+    {num:29, cod:"YAN01", dist:"YANAHUARA",         dest:"PQ PIEDRITAS, MAGISTERIAL, TAHUAYCANI",                   costoEmp:20, costoCond:17},
+    {num:30, cod:"YAN02", dist:"YANAHUARA",         dest:"AV. BOLOGNESI, LEON VELARDE, MAGNOPATA",                  costoEmp:21, costoCond:18},
+    {num:31, cod:"YAN03", dist:"YANAHUARA",         dest:"CLUB INTERNACIONAL, CLINICA AREQUIPA",                    costoEmp:21, costoCond:18},
+    {num:32, cod:"YAN03", dist:"YANAHUARA",         dest:"AV EJERCITO / LA RECOLETA, EMMEL",                        costoEmp:21, costoCond:18},
+    {num:33, cod:"CER01", dist:"CERCADO",           dest:"CENTRO, SIGLO XX, VALLECITO, SAN LAZARO",                 costoEmp:25, costoCond:22},
+    {num:34, cod:"CER01", dist:"CERCADO",           dest:"LOS PINOS, SAN ISIDRO, UNIV. SAN PABLO",                  costoEmp:25, costoCond:22},
+    {num:35, cod:"CER01", dist:"CERCADO",           dest:"PQ INDUSTRIAL, HOSP. GENERAL, PABLO VI, LA ALBORADA",     costoEmp:25, costoCond:22},
+    {num:36, cod:"CER01", dist:"CERCADO",           dest:"IV CENTENARIO, SALAVERRY, FERROVIARIOS",                  costoEmp:25, costoCond:22},
+    {num:37, cod:"CER02", dist:"CERCADO",           dest:"AV GOYENECHE, AV INDEPENDENCIA",                          costoEmp:26, costoCond:23},
+    {num:38, cod:"CER02", dist:"CERCADO",           dest:"VENEZUELA, PARRA, CABAÑA MARIA, SEDAPAR",                 costoEmp:26, costoCond:23},
+    {num:39, cod:"CER03", dist:"CERCADO",           dest:"LAS ORQUIDEAS, PQ LAMBRAMANI, AV INCAS",                  costoEmp:26, costoCond:23},
+    {num:40, cod:"CER03", dist:"CERCADO",           dest:"TINGO, URB PANORAMA, LA ISLA, ESTADIO UNSA",              costoEmp:26, costoCond:23},
+    {num:41, cod:"CER03", dist:"CERCADO",           dest:"AV ALFONSO UGARTE / LECHE GLORIA",                        costoEmp:26, costoCond:23},
+    {num:42, cod:"ASA01", dist:"ASA",               dest:"APURIMAC, INDEPENDENCIA, LAS TORRES/LETICIA, OBRERA",     costoEmp:29, costoCond:26},
+    {num:43, cod:"ASA02", dist:"ASA",               dest:"CONSEJO ASA, GRAFICOS, POLI. ESPIRITU SANTO",             costoEmp:25, costoCond:22},
+    {num:44, cod:"ASA02", dist:"ASA",               dest:"COMISARIA ASA, AV ESPAÑA, AV AREQUIPA",                   costoEmp:25, costoCond:22},
+    {num:45, cod:"ASA02", dist:"ASA",               dest:"PAMPAS DE POLANCO, JAVIER HERAUD",                        costoEmp:25, costoCond:22},
+    {num:46, cod:"ASA03", dist:"ASA",               dest:"SAN LUIS, VILLA ASUNCION, GRIFO CHACHAS",                 costoEmp:31, costoCond:28},
+    {num:47, cod:"CAY01", dist:"CAYMA",             dest:"PLAZA DE CAYMA, LOS ARCES, INGENIEROS, LOS ANGELES DE CAY",costoEmp:19, costoCond:16},
+    {num:48, cod:"CAY01", dist:"CAYMA",             dest:"AV EJERCITO, REAL PLAZA, MALL PLAZA, SEÑORIAL, ABIDGE",   costoEmp:19, costoCond:16},
+    {num:49, cod:"CAY01", dist:"CAYMA",             dest:"LAS TERRAZAS, SANTA ELISA, LOS PORTALES, EL REMANSO",     costoEmp:19, costoCond:16},
+    {num:50, cod:"CAY02", dist:"CAYMA",             dest:"BELLO HORIZONTE, HOSP PNP, URB LA MARINA, SAN ANTONIO",   costoEmp:20, costoCond:17},
+    {num:51, cod:"CAY03", dist:"CAYMA",             dest:"BUENOS AIRES, PLAZA BOLOGNESI, LA TOMILLA",               costoEmp:24, costoCond:21},
+    {num:52, cod:"CAY03", dist:"CAYMA",             dest:"CARMEN ALTO, LA TOMILLA, ACEQUIA ALTA",                   costoEmp:24, costoCond:21},
+    {num:53, cod:"CAY03", dist:"CAYMA",             dest:"LAS MALVINAS, ESTADIO BOLOGNESI",                         costoEmp:28, costoCond:25},
+    {num:54, cod:"CAY04", dist:"CAYMA",             dest:"RADIO AZUL, RAFAEL BELAUNDE, ENACE",                      costoEmp:29, costoCond:26},
+    {num:55, cod:"MAR01", dist:"MARIANO MELGAR",    dest:"M. MELGAR PARTE ALTA, MIGUEL. GRAU",                      costoEmp:31, costoCond:28},
+    {num:56, cod:"MAR01", dist:"MARIANO MELGAR",    dest:"AV ARGENTINA, AV PERU, ALTO SAN MARTIN",                  costoEmp:31, costoCond:28},
+    {num:57, cod:"MAR02", dist:"MARIANO MELGAR",    dest:"M. MELGAR PARTE BAJA, AV LIMA",                           costoEmp:29, costoCond:26},
+    {num:58, cod:"MAR02", dist:"MARIANO MELGAR",    dest:"PLAZA UMACHIRI, SANTA ROSA, GRAN UNIDAD MARIANO MELGAR",  costoEmp:29, costoCond:26},
+    {num:59, cod:"MAR03", dist:"MARIANO MELGAR",    dest:"ATALAYA, LA RINCONADA",                                   costoEmp:32, costoCond:29},
+    {num:60, cod:"MAR04", dist:"MARIANO MELGAR",    dest:"JERUSALEN",                                               costoEmp:35, costoCond:32},
+    {num:61, cod:"TIA01", dist:"TIABAYA",           dest:"CONCEJO TIABAYA, LOS TUNALES, SAN JOSE DE TIABAYA",       costoEmp:29, costoCond:26},
+    {num:62, cod:"TIA01", dist:"TIABAYA",           dest:"ALATA, 8 DE DICIEMBRE",                                   costoEmp:29, costoCond:26},
+    {num:63, cod:"TIA02", dist:"TIABAYA",           dest:"PAMPAS NUEVAS",                                           costoEmp:32, costoCond:29},
+    {num:64, cod:"UCH01", dist:"UCHUMAYO",          dest:"CONGATA, HUAYCO",                                         costoEmp:39, costoCond:36},
+    {num:65, cod:"UCH02", dist:"UCHUMAYO",          dest:"PJ. CERRO VERDE",                                         costoEmp:39, costoCond:36},
+    {num:66, cod:"YUR01", dist:"YURA",              dest:"CIUDAD DE DIOS KM 16",                                    costoEmp:29, costoCond:26},
+    {num:67, cod:"YUR02", dist:"YURA",              dest:"CIUDAD DE DIOS KM 13-14, OVALO ENTRADA APIPA",            costoEmp:27, costoCond:24},
+    {num:68, cod:"MIR01", dist:"MIRAFLORES",        dest:"OVALO MARISCAL CASTILLA, CHAPI CHICO",                    costoEmp:27, costoCond:24},
+    {num:69, cod:"MIR01", dist:"MIRAFLORES",        dest:"PQ MAYTA CAPAC, CALLE PUNO, AV PROGRESO",                 costoEmp:27, costoCond:24},
+    {num:70, cod:"MIR02", dist:"MIRAFLORES",        dest:"FERIA DEL ALTIPLANO, C.C. DON MANUEL",                    costoEmp:28, costoCond:25},
+    {num:71, cod:"MIR03", dist:"MIRAFLORES",        dest:"AV TARAPACA, COOP 14, TORRES DE LA ALAMEDA",              costoEmp:29, costoCond:26},
+    {num:72, cod:"MIR03", dist:"MIRAFLORES",        dest:"AV GOYENECHE (PARTE ALTA), ALTO MISTI, PORVENIR",         costoEmp:29, costoCond:26},
+    {num:73, cod:"MIR04", dist:"MIRAFLORES",        dest:"TOMASA TITO CONDEMAYTA, GALAXIA",                         costoEmp:35, costoCond:32},
+    {num:74, cod:"SOC01", dist:"SOCABAYA",          dest:"4 DE OCTUBRE, LARA, CIUD MI TRAB",                        costoEmp:31, costoCond:28},
+    {num:75, cod:"SOC01", dist:"SOCABAYA",          dest:"SAN MARTIN DE SOCABAYA, VILLA EL GOLF",                   costoEmp:31, costoCond:28},
+    {num:76, cod:"SOC02", dist:"SOCABAYA",          dest:"SOCABAYA PUEBLO, LA CAMPIÑA",                             costoEmp:39, costoCond:36},
+    {num:77, cod:"JLB01", dist:"JL BUSTAMANTE Y R.",dest:"C. APACHETA, ANDRES AVELINO C. (MERCADOS)",               costoEmp:24, costoCond:21},
+    {num:78, cod:"JLB01", dist:"JL BUSTAMANTE Y R.",dest:"BANCARIOS, ADEPA, AGRICULTURA",                           costoEmp:24, costoCond:21},
+    {num:79, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"ALTO DE LA LUNA, AV DOLORES, LA MELGARIANA",              costoEmp:29, costoCond:26},
+    {num:80, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"JUAN P. VIZCARDO Y GUZMAN, URB LA FLORIDA, LAMBRAMANI",   costoEmp:29, costoCond:26},
+    {num:81, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"SATELITE GRANDE, SATELITE CHICO, INST. PEDRO P DIAZ",     costoEmp:29, costoCond:26},
+    {num:82, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"AV. EEUU, VINATEA REINOSO, 13 DE ENERO",                  costoEmp:29, costoCond:26},
+    {num:83, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"URB SANTO DOMINGO, VILLA MEDICA",                         costoEmp:29, costoCond:26},
+    {num:84, cod:"JLB03", dist:"JL BUSTAMANTE Y R.",dest:"SIMON BOLIVAR, 4 DE OCTUBRE, URB LA ALBORADA",            costoEmp:31, costoCond:28},
+    {num:85, cod:"JLB03", dist:"JL BUSTAMANTE Y R.",dest:"PQ. LOS CORITOS, UNIV. SAN MARTIN, TASAHUAYO",            costoEmp:31, costoCond:28},
+    {num:86, cod:"HUN01", dist:"HUNTER (JACOBO H.)",dest:"CONCEJO HUNTER, METRO, BELLA VISTA, CERRO JULY",          costoEmp:26, costoCond:23},
+    {num:87, cod:"HUN02", dist:"HUNTER (JACOBO H.)",dest:"LA MANSION, AV PAISAJISTA, UPIS, TINGO GRANDE",           costoEmp:29, costoCond:26},
+    {num:88, cod:"HUN04", dist:"HUNTER (JACOBO H.)",dest:"COLG. JUAN PABLO, POSTA HUNTER, PAMPAS DEL CUSCO",        costoEmp:29, costoCond:26},
+    {num:89, cod:"HUN05", dist:"HUNTER (JACOBO H.)",dest:"PJ ANDRES AVELINO CACERES, COMISARIA, COOP EL CARMEN",    costoEmp:29, costoCond:26},
+    {num:90, cod:"HUN06", dist:"HUNTER (JACOBO H.)",dest:"TERMINAL TERRESTRE, PARQUE INDUSTRIAL",                   costoEmp:24, costoCond:21},
+    {num:91, cod:"SAC01", dist:"SACHACA",           dest:"ALTO DE AMADOS, TIO CHICO, VILLA EL TRIUNFO, LA PLANICIE",costoEmp:29, costoCond:26},
+    {num:92, cod:"SAC02", dist:"SACHACA",           dest:"ARANCOTA, EL DORADO, CASA CAMPO",                         costoEmp:26, costoCond:23},
+    {num:93, cod:"SAC03", dist:"SACHACA",           dest:"AV FERNANDINI, PLAZA DE SACHACA",                         costoEmp:24, costoCond:21},
+    {num:94, cod:"SAC03", dist:"SACHACA",           dest:"HUARANGILLO, PAMPA DE CAMARONES",                         costoEmp:24, costoCond:21},
+    {num:95, cod:"SAC04", dist:"SACHACA",           dest:"URB EL PALACIO, ARRAYANES, PUENTE FIERRO",                costoEmp:24, costoCond:21},
+  ],
+  "Aviación": [
+    {num:1,  cod:"CC01",  dist:"CERRO COLORADO",    dest:"PLAZA LAS AMERICAS, PRIMAVERA, VERACRUZ",                 costoEmp:13, costoCond:12},
+    {num:2,  cod:"CC01",  dist:"CERRO COLORADO",    dest:"CAMPO VERDE, MONTE BELLO",                                costoEmp:13, costoCond:12},
+    {num:3,  cod:"CC01",  dist:"CERRO COLORADO",    dest:"DON GOYO, JARDIN DE AREQUIPA",                            costoEmp:13, costoCond:12},
+    {num:4,  cod:"CC02",  dist:"CERRO COLORADO",    dest:"AV. PERU, RICO POLLO",                                    costoEmp:15, costoCond:13},
+    {num:5,  cod:"CC02",  dist:"CERRO COLORADO",    dest:"CERRO VIEJO, ADUCA, AZORES, SOLAR DE CHALLAPAMPA",        costoEmp:15, costoCond:13},
+    {num:6,  cod:"CC02",  dist:"CERRO COLORADO",    dest:"AREQUIPA CENTER, QUINTA EL SOL, LA FONDA",                costoEmp:15, costoCond:13},
+    {num:7,  cod:"CC03",  dist:"CERRO COLORADO",    dest:"URB COLEGIO INGENIEROS, URB CHALLAPAMPA, LA PRADERA",     costoEmp:16, costoCond:13},
+    {num:8,  cod:"CC03",  dist:"CERRO COLORADO",    dest:"VILLA EL SOL, LA CASTELLANA, SOCOSANI, EL ROSARIO 1 Y 2",costoEmp:16, costoCond:13},
+    {num:9,  cod:"CC03",  dist:"CERRO COLORADO",    dest:"URB. MICHELL, LA TEJADA, LOS ALAMOS, LA MOLINA",          costoEmp:16, costoCond:13},
+    {num:10, cod:"CC04",  dist:"CERRO COLORADO",    dest:"12 DE OCTUBRE, CERRITO LOS ALVAREZ",                      costoEmp:16, costoCond:13},
+    {num:11, cod:"CC04",  dist:"CERRO COLORADO",    dest:"LAS BUGAMBILLAS, VALLE BLANCO, VILLA VERDE, IBARCENA",    costoEmp:16, costoCond:13},
+    {num:12, cod:"CC04",  dist:"CERRO COLORADO",    dest:"ZAMACOLA, V.A.BELAUNDE, VILLA CORPAC, RIO SECO",          costoEmp:16, costoCond:13},
+    {num:13, cod:"CC04",  dist:"CERRO COLORADO",    dest:"CITY CENTER, CLIN. SAN PABLO, PACHACUTEC VIEJO",          costoEmp:16, costoCond:13},
+    {num:14, cod:"CC04",  dist:"CERRO COLORADO",    dest:"ALTO LIBERTAD, MARISCAL CASTILLA, TUPAC AMARU",           costoEmp:16, costoCond:13},
+    {num:15, cod:"CC05",  dist:"CERRO COLORADO",    dest:"PLASTISUR",                                               costoEmp:17, costoCond:14},
+    {num:16, cod:"CC05",  dist:"CERRO COLORADO",    dest:"PLAZA NORTE, TERMINAL PESQUERO",                          costoEmp:17, costoCond:13.5},
+    {num:17, cod:"CC05",  dist:"CERRO COLORADO",    dest:"JOSE SANTOS ATAHUALPA, SEMI R. PACHACUTEC",               costoEmp:17, costoCond:15},
+    {num:18, cod:"CC06",  dist:"CERRO COLORADO",    dest:"VARIANTE DE UCHU, SUPER MIX, PQ INDUSTRIAL RIO SECO",     costoEmp:19, costoCond:16},
+    {num:19, cod:"CC07",  dist:"CERRO COLORADO",    dest:"VILLA PARAISO, LAS FLORES, FONTANA, AV 54, NAZARENO",     costoEmp:21, costoCond:18},
+    {num:20, cod:"CC07",  dist:"CERRO COLORADO",    dest:"ENTRADA MUNICIPAL, ENTRADA LLAMAGAS",                     costoEmp:21, costoCond:18},
+    {num:21, cod:"CC07",  dist:"CERRO COLORADO",    dest:"AEROPUERTO, PERU ARBO",                                   costoEmp:21, costoCond:18},
+    {num:22, cod:"CC08",  dist:"CERRO COLORADO",    dest:"CIUDAD MUNICIPAL, CERRILLOS",                             costoEmp:25, costoCond:22},
+    {num:23, cod:"CC08",  dist:"CERRO COLORADO",    dest:"SOR ANA DE LOS ANGELES, CERRILLOS",                      costoEmp:25, costoCond:22},
+    {num:24, cod:"YAN01", dist:"YANAHUARA",         dest:"PIEDRA SANTA, PRIMAVERA, AV METROPOLITANA",               costoEmp:19, costoCond:16},
+    {num:25, cod:"YAN01", dist:"YANAHUARA",         dest:"MAGISTERIAL III, JUAN XXIII, LOS CEDROS",                 costoEmp:19, costoCond:16},
+    {num:26, cod:"YAN01", dist:"YANAHUARA",         dest:"PZ YANAHUARA, AV. Y URB VICTOR A. BELAUNDE",              costoEmp:19, costoCond:16},
+    {num:27, cod:"YAN01", dist:"YANAHUARA",         dest:"ESTADIO UMACOLLO, HOSPITAL YANAHUARA",                    costoEmp:19, costoCond:16},
+    {num:28, cod:"YAN01", dist:"YANAHUARA",         dest:"PUENTE FATIMA, UNIV. CATOLICA, UMACOLLO",                 costoEmp:19, costoCond:16},
+    {num:29, cod:"YAN01", dist:"YANAHUARA",         dest:"PQ PIEDRITAS, MAGISTERIAL, TAHUAYCANI",                   costoEmp:19, costoCond:16},
+    {num:30, cod:"YAN02", dist:"YANAHUARA",         dest:"AV. BOLOGNESI, LEON VELARDE, MAGNOPATA",                  costoEmp:21, costoCond:18},
+    {num:31, cod:"YAN03", dist:"YANAHUARA",         dest:"CLUB INTERNACIONAL, CLINICA AREQUIPA",                    costoEmp:21, costoCond:18},
+    {num:32, cod:"YAN03", dist:"YANAHUARA",         dest:"AV EJERCITO / LA RECOLETA, EMMEL",                        costoEmp:21, costoCond:18},
+    {num:33, cod:"CER01", dist:"CERCADO",           dest:"CENTRO, SIGLO XX, VALLECITO, SAN LAZARO",                 costoEmp:24, costoCond:21},
+    {num:34, cod:"CER01", dist:"CERCADO",           dest:"LOS PINOS, SAN ISIDRO, UNIV. SAN PABLO",                  costoEmp:25, costoCond:22},
+    {num:35, cod:"CER01", dist:"CERCADO",           dest:"PQ INDUSTRIAL, HOSP. GENERAL, PABLO VI, LA ALBORADA",     costoEmp:24, costoCond:21},
+    {num:36, cod:"CER01", dist:"CERCADO",           dest:"IV CENTENARIO, SALAVERRY, FERROVIARIOS",                  costoEmp:24, costoCond:21},
+    {num:37, cod:"CER02", dist:"CERCADO",           dest:"AV GOYENECHE, AV INDEPENDENCIA",                          costoEmp:25, costoCond:22},
+    {num:38, cod:"CER02", dist:"CERCADO",           dest:"VENEZUELA, PARRA, CABAÑA MARIA, SEDAPAR",                 costoEmp:25, costoCond:22},
+    {num:39, cod:"CER03", dist:"CERCADO",           dest:"LAS ORQUIDEAS, PQ LAMBRAMANI, AV INCAS",                  costoEmp:25, costoCond:22},
+    {num:40, cod:"CER03", dist:"CERCADO",           dest:"TINGO, URB PANORAMA, LA ISLA, ESTADIO UNSA",              costoEmp:25, costoCond:22},
+    {num:41, cod:"CER03", dist:"CERCADO",           dest:"AV ALFONSO UGARTE / LECHE GLORIA",                        costoEmp:25, costoCond:22},
+    {num:42, cod:"ASA01", dist:"ASA",               dest:"APURIMAC, INDEPENDENCIA, LAS TORRES/LETICIA, OBRERA",     costoEmp:29, costoCond:26},
+    {num:43, cod:"ASA02", dist:"ASA",               dest:"CONSEJO ASA, GRAFICOS, POLI. ESPIRITU SANTO",             costoEmp:25, costoCond:22},
+    {num:44, cod:"ASA02", dist:"ASA",               dest:"COMISARIA ASA, AV ESPAÑA, AV AREQUIPA",                   costoEmp:25, costoCond:22},
+    {num:45, cod:"ASA02", dist:"ASA",               dest:"PAMPAS DE POLANCO, JAVIER HERAUD",                        costoEmp:25, costoCond:22},
+    {num:46, cod:"ASA03", dist:"ASA",               dest:"SAN LUIS, VILLA ASUNCION, GRIFO CHACHAS",                 costoEmp:31, costoCond:28},
+    {num:47, cod:"CAY01", dist:"CAYMA",             dest:"PLAZA DE CAYMA, LOS ARCES, INGENIEROS, LOS ANGELES DE CAY",costoEmp:18, costoCond:15},
+    {num:48, cod:"CAY01", dist:"CAYMA",             dest:"AV EJERCITO, REAL PLAZA, MALL PLAZA, SEÑORIAL, ABIDGE",   costoEmp:18, costoCond:15},
+    {num:49, cod:"CAY01", dist:"CAYMA",             dest:"LAS TERRAZAS, SANTA ELISA, LOS PORTALES, EL REMANSO",     costoEmp:18, costoCond:15},
+    {num:50, cod:"CAY02", dist:"CAYMA",             dest:"BELLO HORIZONTE, HOSP PNP, URB LA MARINA, SAN ANTONIO",   costoEmp:18, costoCond:15},
+    {num:51, cod:"CAY03", dist:"CAYMA",             dest:"BUENOS AIRES, PLAZA BOLOGNESI, LA TOMILLA",               costoEmp:21, costoCond:18},
+    {num:52, cod:"CAY03", dist:"CAYMA",             dest:"CARMEN ALTO, LA TOMILLA, ACEQUIA ALTA",                   costoEmp:21, costoCond:18},
+    {num:53, cod:"CAY03", dist:"CAYMA",             dest:"LAS MALVINAS, ESTADIO BOLOGNESI",                         costoEmp:24, costoCond:21},
+    {num:54, cod:"CAY04", dist:"CAYMA",             dest:"RADIO AZUL, RAFAEL BELAUNDE, ENACE",                      costoEmp:27, costoCond:24},
+    {num:55, cod:"MAR01", dist:"MARIANO MELGAR",    dest:"M. MELGAR PARTE ALTA, MIGUEL. GRAU",                      costoEmp:31, costoCond:28},
+    {num:56, cod:"MAR01", dist:"MARIANO MELGAR",    dest:"AV ARGENTINA, AV PERU, ALTO SAN MARTIN",                  costoEmp:31, costoCond:28},
+    {num:57, cod:"MAR02", dist:"MARIANO MELGAR",    dest:"M. MELGAR PARTE BAJA, AV LIMA",                           costoEmp:29, costoCond:26},
+    {num:58, cod:"MAR02", dist:"MARIANO MELGAR",    dest:"PLAZA UMACHIRI, SANTA ROSA, GRAN UNIDAD MARIANO MELGAR",  costoEmp:29, costoCond:26},
+    {num:59, cod:"MAR03", dist:"MARIANO MELGAR",    dest:"ATALAYA, LA RINCONADA",                                   costoEmp:32, costoCond:29},
+    {num:60, cod:"MAR04", dist:"MARIANO MELGAR",    dest:"JERUSALEN",                                               costoEmp:35, costoCond:32},
+    {num:61, cod:"TIA01", dist:"TIABAYA",           dest:"CONCEJO TIABAYA, LOS TUNALES, SAN JOSE DE TIABAYA",       costoEmp:30, costoCond:27},
+    {num:62, cod:"TIA01", dist:"TIABAYA",           dest:"ALATA, 8 DE DICIEMBRE",                                   costoEmp:30, costoCond:27},
+    {num:63, cod:"TIA02", dist:"TIABAYA",           dest:"PAMPAS NUEVAS",                                           costoEmp:32, costoCond:29},
+    {num:64, cod:"UCH01", dist:"UCHUMAYO",          dest:"CONGATA, HUAYCO",                                         costoEmp:39, costoCond:36},
+    {num:65, cod:"UCH02", dist:"UCHUMAYO",          dest:"PJ. CERRO VERDE",                                         costoEmp:39, costoCond:36},
+    {num:66, cod:"YUR01", dist:"YURA",              dest:"CIUDAD DE DIOS KM 16",                                    costoEmp:28, costoCond:25},
+    {num:67, cod:"YUR02", dist:"YURA",              dest:"CIUDAD DE DIOS KM 13-14, OVALO ENTRADA APIPA",            costoEmp:27, costoCond:24},
+    {num:68, cod:"MIR01", dist:"MIRAFLORES",        dest:"OVALO MARISCAL CASTILLA, CHAPI CHICO",                    costoEmp:26, costoCond:23},
+    {num:69, cod:"MIR01", dist:"MIRAFLORES",        dest:"PQ MAYTA CAPAC, CALLE PUNO, AV PROGRESO",                 costoEmp:26, costoCond:23},
+    {num:70, cod:"MIR02", dist:"MIRAFLORES",        dest:"FERIA DEL ALTIPLANO, C.C. DON MANUEL",                    costoEmp:28, costoCond:25},
+    {num:71, cod:"MIR03", dist:"MIRAFLORES",        dest:"AV TARAPACA, COOP 14, TORRES DE LA ALAMEDA",              costoEmp:28, costoCond:25},
+    {num:72, cod:"MIR03", dist:"MIRAFLORES",        dest:"AV GOYENECHE (PARTE ALTA), ALTO MISTI, PORVENIR",         costoEmp:28, costoCond:25},
+    {num:73, cod:"MIR04", dist:"MIRAFLORES",        dest:"TOMASA TITO CONDEMAYTA, GALAXIA",                         costoEmp:35, costoCond:32},
+    {num:74, cod:"SOC01", dist:"SOCABAYA",          dest:"4 DE OCTUBRE, LARA, CIUD MI TRAB",                        costoEmp:31, costoCond:28},
+    {num:75, cod:"SOC01", dist:"SOCABAYA",          dest:"SAN MARTIN DE SOCABAYA, VILLA EL GOLF",                   costoEmp:31, costoCond:28},
+    {num:76, cod:"SOC02", dist:"SOCABAYA",          dest:"SOCABAYA PUEBLO, LA CAMPIÑA",                             costoEmp:39, costoCond:36},
+    {num:77, cod:"JLB01", dist:"JL BUSTAMANTE Y R.",dest:"C. APACHETA, ANDRES AVELINO C. (MERCADOS)",               costoEmp:26, costoCond:23},
+    {num:78, cod:"JLB01", dist:"JL BUSTAMANTE Y R.",dest:"BANCARIOS, ADEPA, AGRICULTURA",                           costoEmp:26, costoCond:23},
+    {num:79, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"ALTO DE LA LUNA, AV DOLORES, LA MELGARIANA",              costoEmp:28, costoCond:25},
+    {num:80, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"JUAN P. VIZCARDO Y GUZMAN, URB LA FLORIDA, LAMBRAMANI",   costoEmp:28, costoCond:25},
+    {num:81, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"SATELITE GRANDE, SATELITE CHICO, INST. PEDRO P DIAZ",     costoEmp:28, costoCond:25},
+    {num:82, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"AV. EEUU, VINATEA REINOSO, 13 DE ENERO",                  costoEmp:28, costoCond:25},
+    {num:83, cod:"JLB02", dist:"JL BUSTAMANTE Y R.",dest:"URB SANTO DOMINGO, VILLA MEDICA",                         costoEmp:28, costoCond:25},
+    {num:84, cod:"JLB03", dist:"JL BUSTAMANTE Y R.",dest:"SIMON BOLIVAR, 4 DE OCTUBRE, URB LA ALBORADA",            costoEmp:31, costoCond:28},
+    {num:85, cod:"JLB03", dist:"JL BUSTAMANTE Y R.",dest:"PQ. LOS CORITOS, UNIV. SAN MARTIN, TASAHUAYO",            costoEmp:31, costoCond:28},
+    {num:86, cod:"HUN01", dist:"HUNTER (JACOBO H.)",dest:"CONCEJO HUNTER, METRO, BELLA VISTA, CERRO JULY",          costoEmp:27, costoCond:24},
+    {num:87, cod:"HUN02", dist:"HUNTER (JACOBO H.)",dest:"LA MANSION, AV PAISAJISTA, UPIS, TINGO GRANDE",           costoEmp:31, costoCond:28},
+    {num:88, cod:"HUN04", dist:"HUNTER (JACOBO H.)",dest:"COLG. JUAN PABLO, POSTA HUNTER, PAMPAS DEL CUSCO",        costoEmp:31, costoCond:28},
+    {num:89, cod:"HUN05", dist:"HUNTER (JACOBO H.)",dest:"PJ ANDRES AVELINO CACERES, COMISARIA, COOP EL CARMEN",    costoEmp:31, costoCond:28},
+    {num:90, cod:"HUN06", dist:"HUNTER (JACOBO H.)",dest:"TERMINAL TERRESTRE, PARQUE INDUSTRIAL",                   costoEmp:24, costoCond:21},
+    {num:91, cod:"SAC01", dist:"SACHACA",           dest:"ALTO DE AMADOS, TIO CHICO, VILLA EL TRIUNFO, LA PLANICIE",costoEmp:29, costoCond:26},
+    {num:92, cod:"SAC02", dist:"SACHACA",           dest:"ARANCOTA, EL DORADO, CASA CAMPO",                         costoEmp:26, costoCond:23},
+    {num:93, cod:"SAC03", dist:"SACHACA",           dest:"AV FERNANDINI, PLAZA DE SACHACA",                         costoEmp:24, costoCond:21},
+    {num:94, cod:"SAC03", dist:"SACHACA",           dest:"HUARANGILLO, PAMPA DE CAMARONES",                         costoEmp:24, costoCond:21},
+    {num:95, cod:"SAC04", dist:"SACHACA",           dest:"URB EL PALACIO, ARRAYANES, PUENTE FIERRO",                costoEmp:24, costoCond:21},
+    {num:96, cod:"PAU01", dist:"PAUCARPATA",        dest:"AV JESUS BADEN, POLICIA CANINA, AMPLIACION PAUCARPATA",   costoEmp:31, costoCond:29},
+    {num:97, cod:"PAU01", dist:"PAUCARPATA",        dest:"COMISARIA COLQUE APAZA, PLAZA DE PAUCARPATA",             costoEmp:31, costoCond:29},
+    {num:98, cod:"PAU01", dist:"PAUCARPATA",        dest:"MIGUEL GRAU / COMPLEJO BACKUS",                           costoEmp:31, costoCond:29},
+    {num:99, cod:"PAU03", dist:"PAUCARPATA",        dest:"APIMA, 15 DE AGOSTO, JESUS MARIA, MALL AVENTURA",         costoEmp:28, costoCond:26},
+    {num:100,cod:"PAU03", dist:"PAUCARPATA",        dest:"EL CAYRO, EDMUNDO ESCOMEL, AV KENNEDY, MTC",              costoEmp:28, costoCond:26},
+    {num:101,cod:"PAU03", dist:"PAUCARPATA",        dest:"RESERVORIO GUARDIA CIVIL, INST. PEDRO P DIAZ",            costoEmp:28, costoCond:26},
+    {num:102,cod:"PF01",  dist:"PERIFERIE",         dest:"CIUDAD BLANCA, ISRAEL",                                   costoEmp:34, costoCond:32},
+    {num:103,cod:"PF01",  dist:"PERIFERIE",         dest:"PLZ SOCABAYA, PLZ CHARACATO, PLAZA SABANDIA",             costoEmp:38, costoCond:36},
+    {num:104,cod:"PF01",  dist:"PERIFERIE",         dest:"BAÑOS DE JESUS, BAÑOS YURA, CAMPO MARTE, (TROCHA)",       costoEmp:38, costoCond:36},
+    {num:105,cod:"SXH",   dist:"PERIFERIE",         dest:"SERVICIO X HORA",                                         costoEmp:34, costoCond:32},
+  ],
+};
+// Talleres Aviación (Kia, Nissan, Chevrolet, Hyundai)
+["Taller Kia","Taller Nissan","Taller Chevrolet","Taller Hyundai"].forEach(t => {
+  DESTINOS_POR_TALLER[t] = DESTINOS_POR_TALLER["Aviación"];
+});
+// Planchado usa tarifario Evitamiento
+["Planchado"].forEach(t => {
+  DESTINOS_POR_TALLER[t] = DESTINOS_POR_TALLER["Evitamiento"];
+});
+function getDestinos(taller) { return DESTINOS_POR_TALLER[taller] || DESTINOS_POR_TALLER["Evitamiento"]; }
+
+// ============================================================
+//  STATE
+// ============================================================
+let state = {
+  rol: null, usuario: null, adminId: null, unidad: null,
+  tabActiva: "ingresar",
+  vales: [],
+  tallerSeleccionado: "TALLER EVITAMIENTO MULTIMARCA",
+  movimientos: (() => { try { const d=localStorage.getItem("trebol_cache_movimientos"); return d?JSON.parse(d):[]; } catch(e){return[];} })(),
+};
+
+// ============================================================
+//  SUPABASE — BASE DE DATOS EN LA NUBE
+//  Todos los dispositivos comparten la misma base de datos
+// ============================================================
+const SB_URL  = "https://mumzpxiejluqcmdlpotk.supabase.co";
+const SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bXpweGllamx1cWNtZGxwb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODkzNzUsImV4cCI6MjA5NDI2NTM3NX0.I64Fu7_zbv03dC0cfQYbKuupmo8EVrR5MFleQ90qIig";
+const SB_HEADERS = {
+  "Content-Type": "application/json",
+  "apikey": SB_KEY,
+  "Authorization": "Bearer " + SB_KEY,
+  "Prefer": "return=representation"
+};
+
+let _syncTimer = null;
+
+// Muestra un toast de sincronización en pantalla
+function showSyncToast(msg, color) {
+  let t = document.getElementById("sync-toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "sync-toast";
+    t.style.cssText = "position:fixed;bottom:16px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;z-index:9999;transition:opacity .4s;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.2)";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = color || "#1a1a2e";
+  t.style.color = "#fff";
+  t.style.opacity = "1";
+  clearTimeout(t._hide);
+  t._hide = setTimeout(() => { t.style.opacity = "0"; }, 2500);
+}
+
+// Lee todos los vales y movimientos desde Supabase
+async function leerNube() {
+  showSyncToast("☁️ Cargando datos...", "#1565c0");
+  const [resV, resM] = await Promise.all([
+    fetch(`${SB_URL}/rest/v1/vales?select=*&order=id.asc`, { headers: SB_HEADERS }),
+    fetch(`${SB_URL}/rest/v1/movimientos?select=*&order=id.asc`, { headers: SB_HEADERS })
+  ]);
+  if (!resV.ok || !resM.ok) throw new Error("Error al leer Supabase");
+  const valesRaw = await resV.json();
+  const movsRaw  = await resM.json();
+
+  // Convertir de snake_case (Supabase) a camelCase (app)
+  const vales = valesRaw.map(v => ({
+    id: v.id, fecha: v.fecha, hora: v.hora,
+    conductor: v.conductor, unidad: v.unidad,
+    taller: v.taller, nvale: v.nvale,
+    ordenServicio: v.orden_servicio,
+    destinoNum: v.destino_num, codigoDest: v.codigo_dest,
+    distDest: v.dist_dest, destino: v.destino,
+    costoCond: Number(v.costo_cond), costoEmp: Number(v.costo_emp),
+    empresa: v.empresa, nota: "", editado: v.editado || false
+  }));
+  const movimientos = movsRaw.map(m => ({
+    id: m.id, tipo: m.tipo, monto: Number(m.monto),
+    fecha: m.fecha, desc: m.descripcion,
+    extra: m.extra, periodo: m.periodo,
+    registradoPor: m.registrado_por, horaReg: m.hora_reg
+  }));
+  return { vales, movimientos };
+}
+
+// Guarda UN vale nuevo en Supabase
+async function guardarValeNube(vale) {
+  const body = {
+    id: vale.id, fecha: vale.fecha, hora: vale.hora,
+    conductor: vale.conductor, unidad: vale.unidad,
+    taller: vale.taller, nvale: vale.nvale,
+    orden_servicio: vale.ordenServicio,
+    destino_num: vale.destinoNum, codigo_dest: vale.codigoDest,
+    dist_dest: vale.distDest, destino: vale.destino,
+    costo_cond: vale.costoCond, costo_emp: vale.costoEmp,
+    empresa: vale.empresa, editado: vale.editado || false
+  };
+  const res = await fetch(`${SB_URL}/rest/v1/vales`, {
+    method: "POST",
+    headers: SB_HEADERS,
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error("Error guardando vale: " + err);
+  }
+}
+
+// Guarda UN movimiento nuevo en Supabase
+async function guardarMovimientoNube(mov) {
+  const body = {
+    id: mov.id, tipo: mov.tipo, monto: mov.monto,
+    fecha: mov.fecha, descripcion: mov.desc,
+    extra: mov.extra, periodo: mov.periodo || "",
+    registrado_por: mov.registradoPor, hora_reg: mov.horaReg
+  };
+  const res = await fetch(`${SB_URL}/rest/v1/movimientos`, {
+    method: "POST",
+    headers: SB_HEADERS,
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error("Error guardando movimiento: " + err);
+  }
+}
+
+// Elimina todos los vales de un conductor y los reinserta (para sync)
+async function sincronizarValesConductor(conductor, vales) {
+  // Upsert: insert or update por id
+  const bodies = vales.map(vale => ({
+    id: vale.id, fecha: vale.fecha, hora: vale.hora,
+    conductor: vale.conductor, unidad: vale.unidad,
+    taller: vale.taller, nvale: vale.nvale,
+    orden_servicio: vale.ordenServicio,
+    destino_num: vale.destinoNum, codigo_dest: vale.codigoDest,
+    dist_dest: vale.distDest, destino: vale.destino,
+    costo_cond: vale.costoCond, costo_emp: vale.costoEmp,
+    empresa: vale.empresa, editado: vale.editado || false
+  }));
+  const res = await fetch(`${SB_URL}/rest/v1/vales`, {
+    method: "POST",
+    headers: { ...SB_HEADERS, "Prefer": "resolution=merge-duplicates,return=representation" },
+    body: JSON.stringify(bodies)
+  });
+  if (!res.ok) throw new Error("Error sync: " + await res.text());
+}
+
+// Compatibilidad: guardarNube ahora no hace nada (se guarda inmediatamente al crear)
+function guardarNube() { /* los datos se guardan registro por registro */ }
+
+// Auto-refresh cada 30 segundos para moderador/admin
+function iniciarAutoRefresh() {
+  if (state.rol === "conductor") return;
+  setInterval(async () => {
+    try {
+      const datos = await leerNube();
+      state.vales = datos.vales || [];
+      state.movimientos = datos.movimientos || [];
+      renderNav();
+      showSyncToast("🔄 Datos actualizados", "#1565c0");
+    } catch(e) {}
+  }, 30000);
+}
+
+// ── Compatibilidad con funciones antiguas ──────────────────────
+function cargarLocal(key) {
+  try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : []; }
+  catch(e) { return []; }
+}
+function guardarLocal(key, data) {
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+}
+function guardarValesLocal()       { /* se guarda en tiempo real con guardarValeNube */ }
+function guardarMovimientosLocal() { /* se guarda en tiempo real con guardarMovimientoNube */ }
+
+// ============================================================
+//  LOGIN
+// ============================================================
+let rolSeleccionado = "conductor";
+function selectRol(r) {
+  rolSeleccionado = r;
+  ["conductor","moderador","admin"].forEach(x =>
+    document.getElementById("btn-"+x).classList.toggle("active", x===r)
+  );
+  poblarNombres();
+}
+function poblarNombres() {
+  const sel = document.getElementById("login-nombre");
+  sel.innerHTML = '<option value="">— seleccionar —</option>';
+  if (rolSeleccionado === "moderador") {
+    sel.innerHTML += '<option value="Moderador">Moderador General</option>';
+  } else if (rolSeleccionado === "admin") {
+    ADMINS.forEach(a => sel.innerHTML += `<option value="${a.id}">${a.nombre}</option>`);
+  } else {
+    CONDUCTORES.forEach(c => sel.innerHTML += `<option value="${c.nombre}">${c.nombre} · Unidad ${c.id}</option>`);
+  }
+}
+function showLoginMsg(msg, type) {
+  const el = document.getElementById("login-msg");
+  el.textContent = msg;
+  el.style.color = type==="err" ? "var(--red)" : "var(--green)";
+}
+function doLogin() {
+  const nombre = document.getElementById("login-nombre").value;
+  const pass   = document.getElementById("login-pass").value;
+  if (!nombre) { showLoginMsg("Selecciona tu nombre", "err"); return; }
+  if (!pass)   { showLoginMsg("Ingresa tu contraseña (DNI/Carnet)", "err"); return; }
+
+  // Validar credenciales primero
+  if (rolSeleccionado === "moderador") {
+    if (pass !== MOD_PASS) { showLoginMsg("Contraseña incorrecta", "err"); return; }
+    state.rol = "moderador"; state.usuario = "Moderador";
+  } else if (rolSeleccionado === "admin") {
+    const adm = ADMINS.find(a => a.id === nombre);
+    if (!adm || pass !== adm.pass) { showLoginMsg("Contraseña incorrecta", "err"); return; }
+    state.rol = "admin"; state.usuario = adm.nombre; state.adminId = adm.id;
+  } else {
+    const cond = CONDUCTORES.find(c => c.nombre === nombre);
+    if (!cond || pass !== cond.pass) { showLoginMsg("Contraseña incorrecta", "err"); return; }
+    state.rol = "conductor"; state.usuario = nombre;
+    state.unidad = cond.id;
+  }
+
+  // Mostrar pantalla de carga
+  showLoginMsg("☁️ Cargando datos de la nube...", "ok");
+
+  // Cargar datos desde JSONBin
+  leerNube().then(datos => {
+    const todosVales = datos.vales || [];
+    state.movimientos = datos.movimientos || [];
+
+    if (state.rol === "conductor") {
+      state.vales = todosVales.filter(v => v.conductor === state.usuario);
+    } else {
+      state.vales = todosVales.sort((a,b) => a.id - b.id);
+    }
+
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("main-screen").style.display = "block";
+    document.getElementById("header-user").textContent = state.usuario;
+    renderNav();
+    const firstTab = state.rol === "conductor" ? "ingresar" : (state.rol === "admin" ? "admin-panel" : "resumen");
+    renderTab(firstTab);
+    iniciarAutoRefresh();
+
+  }).catch(() => {
+    // Sin conexión: usar caché local
+    const cache = localStorage.getItem("trebol_cache_vales");
+    const todosVales = cache ? JSON.parse(cache) : [];
+    const cacheM = localStorage.getItem("trebol_cache_movimientos");
+    state.movimientos = cacheM ? JSON.parse(cacheM) : [];
+
+    if (state.rol === "conductor") {
+      state.vales = todosVales.filter(v => v.conductor === state.usuario);
+    } else {
+      state.vales = todosVales.sort((a,b) => a.id - b.id);
+    }
+
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("main-screen").style.display = "block";
+    document.getElementById("header-user").textContent = state.usuario;
+    renderNav();
+    const firstTab = state.rol === "conductor" ? "ingresar" : (state.rol === "admin" ? "admin-panel" : "resumen");
+    renderTab(firstTab);
+    showSyncToast("⚠️ Modo sin conexión — datos locales", "#e8a500");
+  });
+}
+function logout() {
+  wtCleanup();
+  state.rol = null; state.usuario = null; state.adminId = null;
+  document.getElementById("main-screen").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("login-pass").value = "";
+  showLoginMsg("","");
+}
+
+// ============================================================
+//  NAV
+// ============================================================
+function renderNav() {
+  let tabs;
+  if (state.rol === "moderador") {
+    tabs = [
+      {id:"resumen",label:"📊 Resumen"},{id:"vales",label:"📋 Vales"},
+      {id:"errores",label:"⚠️ Errores"},{id:"tarifario",label:"🗺️ Tarifario"},
+      {id:"walkie",label:"📻 Radio"},{id:"exportar",label:"⬇️ Exportar"},
+      {id:"contrasenas",label:"🔑 Contraseñas"}
+    ];
+  } else if (state.rol === "admin") {
+    tabs = [
+      {id:"admin-panel",label:"💰 Panel Admin"},
+      {id:"tarifario",label:"🗺️ Tarifario"},
+      {id:"walkie",label:"📻 Radio"}
+    ];
+  } else {
+    tabs = [
+      {id:"ingresar",label:"✏️ Ingresar"},{id:"mis-vales",label:"📋 Mis Vales"},
+      {id:"tarifario",label:"🗺️ Tarifario"},{id:"walkie",label:"📻 Radio"}
+    ];
+  }
+  document.getElementById("nav-bar").innerHTML = tabs.map(t =>
+    `<div class="nav-item${state.tabActiva===t.id?" active":""}" onclick="renderTab('${t.id}')">${t.label}</div>`
+  ).join("");
+  const nerr = state.vales.filter(v => detectarErrores(v).length > 0).length;
+  const badge = document.getElementById("header-badge");
+  if (nerr > 0 && state.rol === "moderador") { badge.textContent = nerr; badge.style.display="inline-block"; }
+  else badge.style.display="none";
+}
+function renderTab(tab) {
+  state.tabActiva = tab;
+  renderNav();
+  const mc = document.getElementById("main-content");
+  if (tab==="ingresar")         mc.innerHTML = buildIngresar();
+  else if (tab==="mis-vales")   mc.innerHTML = buildMisVales();
+  else if (tab==="vales")       mc.innerHTML = buildTodosVales();
+  else if (tab==="errores")     mc.innerHTML = buildErrores();
+  else if (tab==="tarifario")   mc.innerHTML = buildTarifario();
+  else if (tab==="walkie")      { mc.innerHTML = buildWalkie(); initWalkie(); }
+  else if (tab==="resumen")     mc.innerHTML = buildResumen();
+  else if (tab==="exportar")    mc.innerHTML = buildExportar();
+  else if (tab==="admin-panel") mc.innerHTML = buildAdminPanel();
+  else if (tab==="contrasenas") mc.innerHTML = buildContrasenas();
+}
+
+// ============================================================
+//  DETECTAR ERRORES
+// ============================================================
+function detectarErrores(v) {
+  const e = [];
+  if (!v.nvale || !v.nvale.trim()) e.push("Falta N° de vale");
+  if (!v.destinoNum) e.push("Sin destino asignado");
+  const lista = getDestinos(v.taller);
+  const d = lista.find(x => x.num === v.destinoNum);
+  if (d && Math.abs(v.costoCond - d.costoCond) > 0.01)
+    e.push(`Costo incorrecto: S/${v.costoCond?.toFixed(2)}, debería S/${d.costoCond.toFixed(2)}`);
+  // Duplicado de OT
+  const dupOT = state.vales.filter(x => x.ordenServicio === v.ordenServicio && x.id !== v.id);
+  if (dupOT.length > 0)
+    e.push(`OT duplicada: también registrada por ${dupOT.map(x=>x.conductor).join(", ")}`);
+  // N° vale repetido (mismo taller)
+  if (v.nvale) {
+    const dupVale = state.vales.filter(x => x.nvale === v.nvale && x.taller === v.taller && x.id !== v.id);
+    if (dupVale.length > 0)
+      e.push(`N° vale "${v.nvale}" repetido en mismo taller (${dupVale.map(x=>x.conductor).join(", ")})`);
+  }
+  return e;
+}
+
+// ============================================================
+//  INGRESAR VALE
+// ============================================================
+
+// Normaliza el número de vale de Hyundai:
+// acepta "A-001-6", "A001-6", "6" → siempre guarda "A-001-6"
+function normalizarNvale(raw, taller) {
+  const s = raw.trim();
+  if (taller === "Taller Hyundai") {
+    // Si ya tiene el prefijo A-001- lo dejamos
+    if (/^A-?0*1-/i.test(s)) return s.toUpperCase();
+    // Si es solo el número final (ej "6" o "06")
+    if (/^\d+$/.test(s)) return `A-001-${s}`;
+    return s.toUpperCase();
+  }
+  return s;
+}
+
+function buildIngresar() {
+  const talleres = Object.keys(TALLERES_INFO);
+  const tallerSel = state.tallerSeleccionado || "Evitamiento";
+  const info = TALLERES_INFO[tallerSel];
+  const empresa = info.empresa === "TS" ? "TRÉBOL SUR SAC" : (info.empresa === "INC" ? "INCAMOTORS" : "PERUMOTOR SAC");
+  return `
+  <div class="card">
+    <div class="section-title">✏️ Nuevo Vale</div>
+
+    <!-- TALLER: cuadrante numérico — presionar del 1 al 6 para seleccionar -->
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap">
+      <div class="fld" style="flex:0 0 auto">
+        <label>Taller asignado</label>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:2px" id="taller-num-grid">
+          ${Object.entries(TALLERES_INFO).map(([t,info]) => `
+            <div onclick="seleccionarTaller('${t}')"
+              id="tnum-${info.num}"
+              title="${t}"
+              style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;cursor:pointer;border:2px solid ${t===tallerSel?'var(--dark)':'var(--border)'};background:${t===tallerSel?'var(--dark)':'#fff'};color:${t===tallerSel?'#fff':'var(--text-2)'};transition:all .15s">
+              ${info.num}
+            </div>`).join("")}
+        </div>
+        <div class="hint" id="i-taller-hint" style="color:var(--text-3);font-weight:600;margin-top:6px;font-size:12px">Presiona un número para seleccionar taller</div>
+        <input type="hidden" id="i-taller" value="${tallerSel}">
+      </div>
+      <div class="fld" style="flex:1;min-width:160px">
+        <label>Taller</label>
+        <div id="i-taller-nombre" style="padding:8px 12px;border-radius:9px;font-size:13px;font-weight:700;background:var(--bg);border:1.5px solid var(--border)">${tallerSel}</div>
+      </div>
+      <div class="fld" style="flex:1;min-width:140px">
+        <label>Empresa factura</label>
+        <div id="i-empresa-badge" style="padding:8px 12px;border-radius:9px;font-size:13px;font-weight:700;background:${info.empresa==='TS'?'#fef3c7':(info.empresa==='INC'?'#e0f7fa':'#dbeafe')};color:${info.empresa==='TS'?'#92400e':(info.empresa==='INC'?'#006064':'#1e40af')}">${empresa}</div>
+      </div>
+    </div>
+    <!-- ORIGEN DEL TALLER -->
+    <div id="i-origen-wrap" style="text-align:center;margin-bottom:14px;padding:10px 16px;background:var(--dark);border-radius:10px">
+      <div style="font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">📍 Sale desde</div>
+      <div id="i-origen-texto" style="font-size:15px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:1px">${info.origen}</div>
+    </div>
+
+    <!-- N° VALE primero (obligatorio), luego OT (opcional) -->
+    <div class="form-row form-row-2">
+      <div class="fld">
+        <label>N° de Vale <span style="color:var(--red);font-size:10px">* obligatorio</span></label>
+        <input id="i-nvale" type="text" placeholder="${tallerSel==='Taller Hyundai'?'Ej. 6 o A-001-6':'Ej. 16661'}" style="font-size:16px;font-weight:700;letter-spacing:1px">
+        <div class="hint" id="i-nvale-hint" style="font-size:11px"></div>
+        <div class="hint" id="i-hyundai-hint" style="color:var(--blue);font-size:11px"></div>
+      </div>
+      <div class="fld">
+        <label>Orden de Servicio <span style="color:var(--text-3);font-size:10px">(opcional)</span></label>
+        <input id="i-orden" type="text" placeholder="Ej. 96019" oninput="verificarDuplicado()">
+        <div class="hint" id="i-orden-hint"></div>
+      </div>
+    </div>
+
+
+
+    <div class="fld" style="margin-bottom:12px">
+      <label>Destino</label>
+      <input id="i-dest-search" placeholder="🔍 Buscar destino o código..." oninput="filtrarDestIngresar()" style="margin-bottom:8px">
+      <select id="i-destino" size="5" style="height:120px;width:100%" onchange="onDestinoChange()">
+        <option value="">— busca o selecciona —</option>
+      </select>
+    </div>
+
+    <div id="i-costos" style="display:none">
+      <div class="costo-display">
+        <div class="label">Tarifa Conductor</div>
+        <div class="valor" id="i-costo-cond">S/ —</div>
+      </div>
+      <div class="costo-empresa-display" id="i-costo-emp-wrap" style="display:none">
+        🔒 Cobra empresa: <strong id="i-costo-emp">S/ —</strong>
+      </div>
+    </div>
+
+    <div class="fld" style="margin-bottom:16px">
+      <label>Fecha del Vale <span style="color:var(--text-3);font-size:10px">(opcional — si es diferente a hoy)</span></label>
+      <input id="i-fecha-vale" type="date">
+      <div class="hint">Si el vale es de otro día, selecciónalo aquí. Si lo dejas vacío se usa la fecha de hoy.</div>
+    </div>    </div>
+
+    <button class="btn btn-primary btn-full" onclick="guardarVale()">💾 Guardar Vale</button>
+    <div id="i-msg" style="margin-top:10px;font-size:13px;text-align:center;font-weight:600"></div>
+
+    <!-- Alertas de duplicado -->
+    <div id="i-dup-alert" style="display:none" class="alert alert-red" style="margin-top:10px"></div>
+  </div>`;
+}
+
+// Detecta duplicado en tiempo real al escribir la OT
+function verificarDuplicado() {
+  const orden = document.getElementById("i-orden")?.value.trim();
+  const hint  = document.getElementById("i-orden-hint");
+  const alert = document.getElementById("i-dup-alert");
+  if (!hint) return;
+  if (!orden) { hint.textContent = ""; if(alert) alert.style.display="none"; return; }
+
+  // Verificar duplicado de OT
+  const dupOT = state.vales.filter(v => v.ordenServicio === orden);
+  if (dupOT.length > 0) {
+    const prev = dupOT[0];
+    hint.textContent = `⚠️ OT duplicada — ya existe: ${prev.conductor}, ${prev.taller}, ${prev.fecha}`;
+    hint.style.color = "var(--red)";
+    if (alert) {
+      alert.style.display = "block";
+      alert.innerHTML = `🚨 <strong>ALERTA DUPLICADO:</strong> La orden <strong>${orden}</strong> ya fue registrada por <strong>${prev.conductor}</strong> el ${prev.fecha} en taller <strong>${prev.taller}</strong>. Verifica antes de guardar.`;
+    }
+    // Auto-asignar taller por último dígito de OT
+    autoTallerPorOrden(orden);
+  } else {
+    hint.textContent = "✅ Orden nueva";
+    hint.style.color = "var(--green)";
+    if (alert) alert.style.display = "none";
+    autoTallerPorOrden(orden);
+  }
+}
+
+// Auto-asignar taller por OT desactivado — el taller se elige manualmente con los recuadros 1-6
+function autoTallerPorOrden(orden) {
+  // sin efecto — el conductor elige el taller presionando los recuadros
+}
+
+function actualizarEmpresaBadge(taller) {
+  const badge = document.getElementById("i-empresa-badge");
+  if (!badge) return;
+  const info = TALLERES_INFO[taller];
+  if (!info) return;
+  const empresa = info.empresa === "TS" ? "TRÉBOL SUR SAC" : (info.empresa === "INC" ? "INCAMOTORS" : "PERUMOTOR SAC");
+  badge.style.background = info.empresa === "TS" ? "#fef3c7" : "#dbeafe";
+  badge.style.color = info.empresa === "TS" ? "#92400e" : "#1e40af";
+  badge.textContent = empresa;
+}
+
+
+// El N° de vale ya NO auto-asigna taller — el taller se selecciona manualmente con los recuadros 1-6
+function onNvaleInput() {
+  // sin efecto sobre el taller
+}
+
+
+// Seleccionar taller desde cuadrante numérico
+function seleccionarTaller(taller) {
+  state.tallerSeleccionado = taller;
+  const hidden = document.getElementById("i-taller");
+  if (hidden) hidden.value = taller;
+  const nombre = document.getElementById("i-taller-nombre");
+  if (nombre) nombre.textContent = taller;
+
+  // Actualizar hint
+  const hint = document.getElementById("i-taller-hint");
+  if (hint) {
+    hint.textContent = `✅ Taller seleccionado: ${taller}`;
+    hint.style.color = "var(--green)";
+  }
+
+  // Actualizar cuadros numerados
+  Object.entries(TALLERES_INFO).forEach(([t, info]) => {
+    const el = document.getElementById("tnum-" + info.num);
+    if (!el) return;
+    const activo = t === taller;
+    el.style.border = "2px solid " + (activo ? "var(--dark)" : "var(--border)");
+    el.style.background = activo ? "var(--dark)" : "#fff";
+    el.style.color = activo ? "#fff" : "var(--text-2)";
+  });
+
+  actualizarEmpresaBadge(taller);
+  // Actualizar origen
+  const origenEl = document.getElementById("i-origen-texto");
+  if (origenEl && TALLERES_INFO[taller]) origenEl.textContent = TALLERES_INFO[taller].origen;
+  poblarDestinosIngresar();
+
+  const hyHint = document.getElementById("i-hyundai-hint");
+  const nvaleInput = document.getElementById("i-nvale");
+  if (taller === "Taller Hyundai") {
+    if (hyHint) hyHint.textContent = 'Puedes escribir solo el número (ej. "6") — se guarda como "A-001-6"';
+    if (nvaleInput) nvaleInput.placeholder = "Ej. 6 o A-001-6";
+  } else {
+    if (hyHint) hyHint.textContent = "";
+    if (nvaleInput) nvaleInput.placeholder = "Ej. 16661";
+  }
+}
+
+function onTallerChange() {
+  const t = document.getElementById("i-taller").value;
+  state.tallerSeleccionado = t;
+  actualizarEmpresaBadge(t);
+  poblarDestinosIngresar();
+  const hyHint = document.getElementById("i-hyundai-hint");
+  const nvaleInput = document.getElementById("i-nvale");
+  if (t === "Hyundai Aviación") {
+    if (hyHint) hyHint.textContent = 'Puedes escribir solo el número (ej. "6") — se guarda como "A-001-6"';
+    if (nvaleInput) nvaleInput.placeholder = 'Ej. 6 o A-001-6';
+  } else {
+    if (hyHint) hyHint.textContent = "";
+    if (nvaleInput) nvaleInput.placeholder = 'Ej. 16661';
+  }
+  const hint = document.getElementById("i-taller-hint");
+  if (hint) { hint.textContent = ""; }
+}
+function poblarDestinosIngresar() {
+  const taller = document.getElementById("i-taller")?.value || state.tallerSeleccionado;
+  const lista = getDestinos(taller);
+  const q = (document.getElementById("i-dest-search")?.value || "").toLowerCase();
+  const filtrada = q ? lista.filter(d =>
+    d.dest.toLowerCase().includes(q) || d.cod.toLowerCase().includes(q) || String(d.num).includes(q)
+  ) : lista;
+  const sel = document.getElementById("i-destino");
+  if (!sel) return;
+  sel.innerHTML = filtrada.map(d =>
+    `<option value="${d.num}" data-cond="${d.costoCond}" data-emp="${d.costoEmp}">${d.num}. [${d.cod}] ${d.dist} — ${d.dest}</option>`
+  ).join("");
+}
+function filtrarDestIngresar() { poblarDestinosIngresar(); }
+function onDestinoChange() {
+  const sel = document.getElementById("i-destino");
+  if (!sel || !sel.value) return;
+  const opt = sel.options[sel.selectedIndex];
+  const cond = parseFloat(opt.dataset.cond);
+  const emp  = parseFloat(opt.dataset.emp);
+  document.getElementById("i-costos").style.display = "block";
+  document.getElementById("i-costo-cond").textContent = `S/ ${cond.toFixed(2)}`;
+  document.getElementById("i-costo-emp").textContent = `S/ ${emp.toFixed(2)}`;
+  document.getElementById("i-costo-emp-wrap").style.display = state.rol === "moderador" ? "block" : "none";
+}
+
+function limpiarFormIngresar() {
+  const ids = ["i-orden","i-nvale","i-fecha-vale","i-dest-search"];
+  ids.forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+  const costos = document.getElementById("i-costos");
+  if (costos) costos.style.display = "none";
+  const hint = document.getElementById("i-taller-hint");
+  if (hint) hint.textContent = "";
+  const ohint = document.getElementById("i-orden-hint");
+  if (ohint) ohint.textContent = "";
+  const hyHint = document.getElementById("i-hyundai-hint");
+  if (hyHint) hyHint.textContent = "";
+  const dup = document.getElementById("i-dup-alert");
+  if (dup) dup.style.display = "none";
+  poblarDestinosIngresar();
+}
+
+function guardarVale() {
+  const orden  = document.getElementById("i-orden").value.trim();
+  const nvaleRaw = document.getElementById("i-nvale").value.trim();
+  const taller = document.getElementById("i-taller").value;
+  const destSel= document.getElementById("i-destino");
+  const destNum= destSel ? parseInt(destSel.value) : 0;
+  const lista  = getDestinos(taller);
+  const dest   = lista.find(d => d.num === destNum);
+  const msg = document.getElementById("i-msg");
+
+  if (!nvaleRaw) { msg.textContent = "⚠️ El N° de vale es obligatorio"; msg.style.color="var(--red)"; return; }
+  if (!dest)  { msg.textContent = "⚠️ Selecciona un destino"; msg.style.color="var(--red)"; return; }
+
+  // Normalizar N° vale
+  const nvale = nvaleRaw ? normalizarNvale(nvaleRaw, taller) : "";
+
+  // Verificar duplicados — OT o N° vale
+  const dupOT = state.vales.find(v => v.ordenServicio === orden);
+  if (dupOT) {
+    const confirmar = confirm(
+      `⚠️ DUPLICADO DETECTADO\n\nLa orden "${orden}" ya fue registrada:\n` +
+      `Conductor: ${dupOT.conductor}\nTaller: ${dupOT.taller}\nFecha: ${dupOT.fecha}\n\n` +
+      `¿Deseas guardarlo igualmente? (solo si es corrección)`
+    );
+    if (!confirmar) return;
+  }
+  if (nvale) {
+    const dupVale = state.vales.find(v => v.nvale === nvale && v.taller === taller);
+    if (dupVale) {
+      const confirmar = confirm(
+        `⚠️ N° DE VALE REPETIDO\n\nEl vale "${nvale}" en taller "${taller}" ya existe:\n` +
+        `Conductor: ${dupVale.conductor} · Fecha: ${dupVale.fecha}\n\n` +
+        `¿Deseas guardarlo igualmente?`
+      );
+      if (!confirmar) return;
+    }
+  }
+
+  const now = new Date();
+  const fechaValeInput = document.getElementById("i-fecha-vale").value;
+  // Si el conductor puso una fecha manual, usarla; si no, la de hoy
+  let fechaVale, fechaValeObj;
+  if (fechaValeInput) {
+    fechaValeObj = new Date(fechaValeInput + "T12:00:00");
+    fechaVale = fechaValeObj.toLocaleDateString("es-PE");
+  } else {
+    fechaVale = now.toLocaleDateString("es-PE");
+  }
+  const vale = {
+    id: Date.now(),
+    fecha: fechaVale,
+    hora: now.toLocaleTimeString("es-PE", {hour:"2-digit",minute:"2-digit"}),
+    conductor: state.usuario, unidad: state.unidad,
+    taller, nvale, ordenServicio: orden,
+    destinoNum: dest.num, codigoDest: dest.cod,
+    distDest: dest.dist, destino: dest.dest,
+    costoCond: dest.costoCond, costoEmp: dest.costoEmp,
+    empresa: TALLERES_INFO[taller]?.empresa || "PM",
+    nota: "",
+    editado: false,
+  };
+  state.vales.push(vale);
+
+  // Guardar en Supabase directamente
+  guardarValeNube(vale).then(() => {
+    showSyncToast("✅ Vale guardado en la nube", "#1e8c45");
+  }).catch(e => {
+    showSyncToast("⚠️ Sin conexión — vale guardado localmente", "#e8a500");
+    const cache = JSON.parse(localStorage.getItem("trebol_cache_vales") || "[]");
+    cache.push(vale);
+    localStorage.setItem("trebol_cache_vales", JSON.stringify(cache));
+  });
+
+  msg.textContent = `✅ Vale guardado — Taller: ${taller}${nvale?" · N°: "+nvale:""}`;
+  msg.style.color = "var(--green)";
+
+  // Limpiar todos los campos para el siguiente vale
+  limpiarFormIngresar();
+  renderNav();
+
+  // Auto-quitar el mensaje de éxito después de 4s
+  setTimeout(() => { if(msg) msg.textContent = ""; }, 4000);
+}
+
+// ============================================================
+//  MIS VALES
+// ============================================================
+function buildMisVales() {
+  const mis = state.vales.filter(v => v.conductor === state.usuario);
+  if (!mis.length) return `<div class="empty-state"><div class="icon">📋</div><p>No has registrado vales aún.<br><span style="font-size:12px;color:var(--text-3)">Tus vales se guardan en la nube y se ven desde cualquier dispositivo.</span></p></div>`;
+  const total = mis.reduce((a,v) => a + v.costoCond, 0);
+  return `
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total vales</div><div class="stat-val">${mis.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Total conductor</div><div class="stat-val" style="font-size:20px">S/ ${total.toFixed(2)}</div></div>
+  </div>
+  ${mis.slice().reverse().map(v => {
+    const errs = detectarErrores(v);
+    return `<div class="vale-card${errs.length?" has-error":""}${v.editado?" editado":""}">
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
+        <div>
+          <strong>Vale #${v.nvale}</strong> &nbsp;<span class="tag ${TALLERES_INFO[v.taller]?.tag||"tag-evit"}">${v.taller}</span>
+          ${errs.length?'<span class="error-chip" style="margin-left:6px">Error</span>':''}
+        </div>
+        <div class="mono" style="font-size:16px;font-weight:700;white-space:nowrap">S/ ${v.costoCond.toFixed(2)}</div>
+      </div>
+      <div style="font-size:13px;color:var(--text-2);margin-top:6px">[${v.codigoDest}] ${v.destino}</div>
+      ${errs.map(e=>`<div style="font-size:11px;color:var(--red);margin-top:3px">⚠️ ${e}</div>`).join("")}
+      <div class="vale-meta"><span>${v.fecha} ${v.hora}</span><span>OT: ${v.ordenServicio}</span>${v.nota?`<span>📝 ${v.nota}</span>`:""}</div>
+    </div>`;
+  }).join("")}`;
+}
+
+// ============================================================
+//  TODOS LOS VALES (moderador)
+// ============================================================
+function buildTodosVales() {
+  const vales = state.vales;
+  if (!vales.length) return `<div class="empty-state"><div class="icon">📋</div><p>Sin vales registrados.</p></div>`;
+  return `<div class="card">
+    <input id="bus-vales" placeholder="🔍 Buscar conductor, vale, taller, destino..." oninput="filtrarVales()"
+      style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;margin-bottom:14px">
+    <div class="table-wrap" id="tabla-vales">${renderTablaVales(vales)}</div>
+  </div>`;
+}
+function renderTablaVales(lista) {
+  return `<table>
+    <thead><tr>
+      <th>Vale</th><th>Conductor</th><th>Taller</th><th>Destino</th>
+      <th style="text-align:right">Cond.</th>
+      <th style="text-align:right;color:var(--amber)">Empresa 🔒</th>
+      <th>Estado</th><th>Fecha</th>
+    </tr></thead>
+    <tbody>${lista.slice().reverse().map(v => {
+      const errs = detectarErrores(v);
+      const empLabel = v.empresa==="TS"?"Trébol Sur":(v.empresa==="INC"?"Incamotors":"Perumotor");
+      return `<tr>
+        <td class="mono">${v.nvale}</td>
+        <td><strong>${v.conductor}</strong> <span style="font-size:11px;color:var(--text-3)">U${v.unidad}</span></td>
+        <td><span class="tag ${TALLERES_INFO[v.taller]?.tag||"tag-evit"}">${v.taller}</span></td>
+        <td style="font-size:12px">[${v.codigoDest}] ${v.destino.substring(0,38)}${v.destino.length>38?"...":""}</td>
+        <td style="text-align:right;font-weight:700">S/ ${v.costoCond.toFixed(2)}</td>
+        <td style="text-align:right;font-weight:700;color:var(--amber)">S/ ${v.costoEmp.toFixed(2)} <span style="font-size:10px;color:var(--text-3)">${empLabel}</span></td>
+        <td>${errs.length?`<span class="error-chip">Error</span>`:`<span class="ok-chip">OK</span>`}</td>
+        <td style="font-size:11px;color:var(--text-3)">${v.fecha}<br>${v.hora}</td>
+      </tr>`;
+    }).join("")}</tbody></table>`;
+}
+function filtrarVales() {
+  const q = document.getElementById("bus-vales").value.toLowerCase();
+  const f = state.vales.filter(v =>
+    v.conductor.toLowerCase().includes(q) || v.nvale.includes(q) ||
+    v.destino.toLowerCase().includes(q) || v.taller.toLowerCase().includes(q)
+  );
+  document.getElementById("tabla-vales").innerHTML = renderTablaVales(f);
+}
+
+// ============================================================
+//  ERRORES
+// ============================================================
+function buildErrores() {
+  const con_err = state.vales.filter(v => detectarErrores(v).length > 0);
+  // Contar duplicados específicamente
+  const dupOTs = {};
+  state.vales.forEach(v => {
+    if (!dupOTs[v.ordenServicio]) dupOTs[v.ordenServicio] = [];
+    dupOTs[v.ordenServicio].push(v);
+  });
+  const otsDup = Object.entries(dupOTs).filter(([,arr]) => arr.length > 1);
+
+  if (!con_err.length) return `
+    <div class="empty-state"><div class="icon">✅</div><p>Sin errores ni duplicados.</p></div>`;
+
+  let html = "";
+
+  // Sección de duplicados primero (más urgente)
+  if (otsDup.length > 0) {
+    html += `<div class="alert alert-red" style="margin-bottom:16px">
+      🚨 <strong>${otsDup.length} Orden(es) de servicio DUPLICADA(S)</strong> — revisar urgente
+    </div>`;
+    otsDup.forEach(([ot, vales]) => {
+      html += `<div class="vale-card has-error" style="border-color:#b91c1c;border-width:2px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="background:#fee2e2;color:var(--red);font-size:11px;font-weight:800;padding:3px 8px;border-radius:5px">🔴 OT DUPLICADA</span>
+          <strong>Orden: ${ot}</strong>
+        </div>
+        <div style="font-size:12px;color:var(--text-2);margin-bottom:6px">Esta orden fue registrada ${vales.length} veces:</div>
+        ${vales.map(v => `
+          <div style="background:var(--bg);border-radius:7px;padding:8px 10px;margin-bottom:4px;font-size:13px">
+            🚗 <strong>${v.conductor}</strong> (U${v.unidad}) · ${v.taller}
+            <span style="float:right;font-family:monospace;color:var(--text-3)">${v.fecha} ${v.hora}</span>
+            <div style="color:var(--text-2);font-size:12px;margin-top:2px">${v.destino}</div>
+          </div>`).join("")}
+      </div>`;
+    });
+  }
+
+  // Otros errores (no duplicados)
+  const otrosErr = con_err.filter(v => {
+    const errs = detectarErrores(v);
+    return errs.some(e => !e.includes("duplicad") && !e.includes("repetido"));
+  });
+  if (otrosErr.length > 0) {
+    html += `<div style="font-size:13px;font-weight:700;color:var(--text-2);margin:16px 0 8px">⚠️ Otros errores (${otrosErr.length})</div>`;
+    otrosErr.forEach(v => {
+      const errs = detectarErrores(v).filter(e => !e.includes("duplicad") && !e.includes("repetido"));
+      if (!errs.length) return;
+      html += `<div class="vale-card has-error">
+        <div style="display:flex;justify-content:space-between">
+          <strong>${v.nvale ? "Vale #"+v.nvale : "Sin N° vale"}</strong> — ${v.conductor} (U${v.unidad})
+        </div>
+        <div style="font-size:13px;color:var(--text-2);margin-top:4px">${v.taller} · ${v.destino||"sin destino"}</div>
+        ${errs.map(e=>`<div style="font-size:13px;color:var(--red);margin-top:4px">⚠️ ${e}</div>`).join("")}
+        <div class="vale-meta"><span>${v.fecha} ${v.hora}</span><span>OT: ${v.ordenServicio}</span></div>
+      </div>`;
+    });
+  }
+  return html;
+}
+
+// ============================================================
+//  TARIFARIO
+// ============================================================
+function buildTarifario() {
+  const talleres = Object.keys(TALLERES_INFO);
+  const sel = state.tallerSeleccionado || "Evitamiento";
+  const info = TALLERES_INFO[sel];
+  const lista = getDestinos(sel);
+  const esMod = state.rol === "moderador";
+  return `<div class="card">
+    <div class="section-title">🗺️ Tarifario</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      ${talleres.map(t => `<button class="btn btn-ghost" style="${t===sel?"background:var(--dark);color:#fff;border-color:var(--dark)":""}" onclick="setTallerTarifario('${t}')">${t}</button>`).join("")}
+    </div>
+    <div class="alert alert-amber" style="margin-bottom:12px">
+      📍 <strong>Origen:</strong> ${info.origen} &nbsp;·&nbsp;
+      Empresa: <strong>${info.empresa==="TS"?"TRÉBOL SUR SAC":(info.empresa==="INC"?"INCAMOTORS":"PERUMOTOR SAC")}</strong>
+    </div>
+    <input id="bus-tarif" placeholder="🔍 Buscar destino, código o N°..." oninput="filtrarTarifario()"
+      style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;margin-bottom:12px">
+    <div class="table-wrap" id="tabla-tarif">${renderTarifHTML(lista, esMod)}</div>
+  </div>`;
+}
+function setTallerTarifario(t) { state.tallerSeleccionado = t; renderTab("tarifario"); }
+function renderTarifHTML(lista, esMod) {
+  return `<table>
+    <thead><tr>
+      <th>N°</th><th>Código</th><th>Distrito</th><th>Destino</th>
+      <th style="text-align:right">Conductor</th>
+      ${esMod?`<th style="text-align:right;color:var(--amber)">Empresa 🔒</th>`:""}
+    </tr></thead>
+    <tbody>${lista.map(d => `<tr>
+      <td class="mono" style="font-weight:700">${d.num}</td>
+      <td><span class="mono" style="font-size:12px">${d.cod}</span></td>
+      <td style="font-size:12px;color:var(--text-2)">${d.dist}</td>
+      <td style="font-size:13px">${d.dest}</td>
+      <td style="text-align:right;font-weight:700">S/ ${d.costoCond.toFixed(2)}</td>
+      ${esMod?`<td style="text-align:right;font-weight:700;color:var(--amber)">S/ ${d.costoEmp.toFixed(2)}</td>`:""}
+    </tr>`).join("")}</tbody></table>`;
+}
+function filtrarTarifario() {
+  const q = document.getElementById("bus-tarif").value.toLowerCase();
+  const lista = getDestinos(state.tallerSeleccionado);
+  const f = lista.filter(d =>
+    d.dest.toLowerCase().includes(q) || d.cod.toLowerCase().includes(q) ||
+    String(d.num).includes(q) || d.dist.toLowerCase().includes(q)
+  );
+  document.getElementById("tabla-tarif").innerHTML = renderTarifHTML(f, state.rol==="moderador");
+}
+
+// ============================================================
+//  RESUMEN (moderador)
+// ============================================================
+function buildResumen() {
+  const vales = state.vales;
+  const total = vales.length;
+  const totCond = vales.reduce((a,v) => a + v.costoCond, 0);
+  const totEmp  = vales.reduce((a,v) => a + v.costoEmp, 0);
+  const diff    = totEmp - totCond;
+  const errores = vales.filter(v => detectarErrores(v).length > 0).length;
+  const byCond = {};
+  vales.forEach(v => {
+    if (!byCond[v.conductor]) byCond[v.conductor] = {n:0,sCond:0,sEmp:0};
+    byCond[v.conductor].n++; byCond[v.conductor].sCond += v.costoCond; byCond[v.conductor].sEmp += v.costoEmp;
+  });
+  const byTaller = {};
+  vales.forEach(v => { byTaller[v.taller] = (byTaller[v.taller]||0) + 1; });
+  const byEmpresa = {TS:0, PM:0, INC:0};
+  vales.forEach(v => { byEmpresa[v.empresa] = (byEmpresa[v.empresa]||0) + v.costoEmp; });
+  return `
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total vales</div><div class="stat-val">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">Total conductores</div><div class="stat-val" style="font-size:18px">S/ ${totCond.toFixed(2)}</div></div>
+    <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label" style="color:var(--amber)">Total empresa 🔒</div><div class="stat-val" style="font-size:18px;color:var(--amber)">S/ ${totEmp.toFixed(2)}</div></div>
+    <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label" style="color:var(--amber)">Diferencia 🔒</div><div class="stat-val" style="font-size:18px;color:var(--amber)">S/ ${diff.toFixed(2)}</div></div>
+    <div class="stat-card${errores?" style=\"border-color:var(--red)\"":""}"><div class="stat-label${errores?" style=\"color:var(--red)\"":""}">Errores</div><div class="stat-val" style="color:${errores?"var(--red)":"inherit"}">${errores}</div></div>
+  </div>
+  <div class="alert alert-amber">🔒 <strong>Trébol Sur SAC:</strong> S/ ${byEmpresa.TS.toFixed(2)} &nbsp;·&nbsp; <strong>Perumotor SAC:</strong> S/ ${byEmpresa.PM.toFixed(2)} &nbsp;·&nbsp; <strong>Incamotors:</strong> S/ ${byEmpresa.INC.toFixed(2)}</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+    <div class="card">
+      <div class="card-title">Por conductor</div>
+      <table><thead><tr><th>Conductor</th><th style="text-align:center">Vales</th><th style="text-align:right">Cond.</th><th style="text-align:right;color:var(--amber)">Empresa 🔒</th></tr></thead>
+      <tbody>${Object.entries(byCond).sort((a,b)=>b[1].sEmp-a[1].sEmp).map(([c,d])=>`
+        <tr><td><strong>${c}</strong></td><td style="text-align:center">${d.n}</td>
+        <td style="text-align:right;font-weight:600">S/ ${d.sCond.toFixed(2)}</td>
+        <td style="text-align:right;font-weight:600;color:var(--amber)">S/ ${d.sEmp.toFixed(2)}</td></tr>`).join("")||
+        '<tr><td colspan="4" style="color:var(--text-3)">Sin datos</td></tr>'}
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-title">Por taller</div>
+      ${Object.entries(byTaller).map(([t,n])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span class="tag ${TALLERES_INFO[t]?.tag||"tag-evit"}">${t}</span>
+          <strong>${n} vales</strong>
+        </div>`).join("")||"<p style='color:var(--text-3)'>Sin datos</p>"}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+//  EXPORTAR — por taller separado, con fecha Perumotor
+// ============================================================
+function buildExportar() {
+  const talleres = Object.keys(TALLERES_INFO);
+  const talleresCon = talleres.filter(t => state.vales.some(v => v.taller === t));
+  return `<div class="card">
+    <div class="section-title">⬇️ Exportar datos</div>
+    <div class="alert alert-green" style="margin-bottom:16px">
+      ✅ Los archivos se descargan en formato <strong>.xlsx (Excel real)</strong> con colores, formato y estructura idéntica al archivo de la empresa: Trébol Sur SAC · Perumotor SAC · secciones por taller · total al final.<br>
+      El botón <strong>"por Conductor"</strong> descarga un archivo separado por cada conductor.
+    </div>
+    <div class="form-row form-row-2" style="margin-bottom:16px">
+      <div class="fld">
+        <label>Fecha del período</label>
+        <input type="date" id="exp-fecha" value="${new Date().toISOString().slice(0,10)}">
+        <div class="hint">Se incluirá en el nombre del archivo</div>
+      </div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="card-title">Exportar por taller</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${talleresCon.map(t => {
+          const n = state.vales.filter(v=>v.taller===t).length;
+          return `<button class="btn btn-ghost" onclick="exportarTaller('${t}')" style="display:flex;gap:6px;align-items:center">
+            <span class="tag ${TALLERES_INFO[t].tag}">${t}</span> <span style="font-size:12px">${n} vales</span> ⬇️
+          </button>`;
+        }).join("")||"<p style='color:var(--text-3);font-size:13px'>Sin vales registrados aún</p>"}
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btn-exp-conductor" class="btn btn-primary" onclick="exportarPorConductor()">👤 Exportar por Conductor (.xlsx)</button>
+      <button id="btn-exp-todos" class="btn btn-blue" onclick="exportarTodos()">📊 Exportar TODOS (.xlsx)</button>
+      <button class="btn" style="color:var(--red);border:1.5px solid #fca5a5" onclick="limpiarTodos()">🗑️ Borrar todos</button>
+    </div>
+  </div>
+  <div class="card" style="background:#f8f8f6">
+    <div class="card-title">Estado</div>
+    <p style="font-size:13px">${state.vales.length} vales en memoria · ${state.vales.filter(v=>detectarErrores(v).length>0).length} con errores</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+      ${Object.entries(
+        state.vales.reduce((acc,v)=>{acc[v.taller]=(acc[v.taller]||0)+1;return acc;},{})
+      ).map(([t,n])=>`<span class="tag ${TALLERES_INFO[t]?.tag||'tag-evit'}">${t}: ${n}</span>`).join("")}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+//  EXPORTAR — Formato exacto del Excel de la empresa
+//  Una hoja por conductor, secciones por taller,
+//  columnas: TALLER | N°VALE | COD.DEST | N°DEST | UNIDAD | CONDUCTOR | OT | DESTINO | A PAGAR
+// ============================================================
+//  EXPORTAR XLSX — Formato exacto del Excel de la empresa
+//  Usa SheetJS (xlsx) para generar .xlsx real con colores y formato
+// ============================================================
+
+// SheetJS se carga desde CDN cuando se necesita
+let XLSX_LIB = null;
+async function cargarXLSX() {
+  if (XLSX_LIB) return XLSX_LIB;
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    s.onload = () => { XLSX_LIB = window.XLSX; resolve(XLSX_LIB); };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+const TALLER_EXCEL = {
+  "Evitamiento":      "Evit Mult Marca",
+  "Taller 1":         "Evit Mult Marca",
+  "Aviación":         "Evit Mult Marca",
+  "Planchado":        "Planchado",
+  "Taller 2 Kia":     "Kia",
+  "Nissan":           "Nissan",
+  "Chevrolet":        "Chevrolet",
+  "Hyundai Aviación": "Hyundai Aviacion",
+};
+const ORDEN_TALLERES_EXP = ["Evit Mult Marca","Planchado","Kia","Nissan","Chevrolet","Hyundai Aviacion"];
+
+// Colores por taller (ARGB sin #)
+const COLOR_TALLER = {
+  "Evit Mult Marca":    "FFDEEAF1",
+  "Planchado":          "FFFCE4D6",
+  "Kia":                "FFE2EFDA",
+  "Nissan":             "FFFFF2CC",
+  "Chevrolet":          "FFF2CEEF",
+  "Hyundai Aviacion":   "FFE0F7FA",
+};
+const COLOR_HEADER = "FF1F4E79";   // azul oscuro encabezado
+const COLOR_SUBHDR = "FF2E75B6";   // azul medio columnas
+const COLOR_TOTAL  = "FFFFF2CC";   // amarillo total
+const COLOR_BLANCO = "FFFFFFFF";
+
+function cellStyle(bgColor, bold=false, wrapText=false, hAlign="left", color="FFFFFFFF") {
+  return {
+    fill: { patternType: "solid", fgColor: { rgb: bgColor } },
+    font: { bold, color: { rgb: color }, name: "Arial", sz: 9 },
+    alignment: { horizontal: hAlign, vertical: "center", wrapText },
+    border: {
+      top:    { style: "thin", color: { rgb: "FFB0B0B0" } },
+      bottom: { style: "thin", color: { rgb: "FFB0B0B0" } },
+      left:   { style: "thin", color: { rgb: "FFB0B0B0" } },
+      right:  { style: "thin", color: { rgb: "FFB0B0B0" } },
+    }
+  };
+}
+
+function crearHojaConductor(XLSX, uid, condVales) {
+  const nombreCond = condVales[0].conductor;
+  const ws = {};
+  let R = 0; // fila actual (0-based)
+
+  function setCell(c, v, s) {
+    const addr = XLSX.utils.encode_cell({ r: R, c });
+    ws[addr] = { v, t: typeof v === "number" ? "n" : "s", s };
+  }
+
+  // Fila 1: TREBOL SUR SAC (A1:L1 merge)
+  setCell(0, "TREBOL SUR SAC", cellStyle(COLOR_HEADER, true, false, "center"));
+  ws["!merges"] = ws["!merges"] || [];
+  ws["!merges"].push({ s:{r:R,c:0}, e:{r:R,c:11} });
+  R++;
+
+  // Fila 2: REPORTE DE SERVICIOS
+  setCell(0, "REPORTE DE SERVICIOS PERUMOTOR SAC", cellStyle(COLOR_HEADER, true, false, "left"));
+  ws["!merges"].push({ s:{r:R,c:0}, e:{r:R,c:9} });
+  setCell(10, "N° UNIDAD", cellStyle(COLOR_SUBHDR, true, false, "center"));
+  setCell(11, "CONDUCTOR", cellStyle(COLOR_SUBHDR, true, false, "center"));
+  R++;
+
+  // Fila 3: Cabeceras columnas
+  const hdrs = ["TALLER","Nº VALE","COD. DESTINO","N° DEST","UNIDAD","CONDUCTOR","ORDEN SERVICIO","DESTINO","A PAGAR","","N° UNIDAD","CONDUCTOR"];
+  hdrs.forEach((h,c) => setCell(c, h, cellStyle(COLOR_SUBHDR, true, true, "center")));
+  // Info conductor en K4 / L4 (fila siguiente a cabecera)
+  R++;
+
+  // Fila 4 info conductor (K,L)
+  setCell(10, Number(uid), cellStyle(COLOR_BLANCO, false, false, "center", "FF000000"));
+  setCell(11, nombreCond,  cellStyle(COLOR_BLANCO, false, false, "left",   "FF000000"));
+
+  // Agrupar vales por taller
+  const porTaller = {};
+  condVales.forEach(v => {
+    const te = TALLER_EXCEL[v.taller] || v.taller;
+    if (!porTaller[te]) porTaller[te] = [];
+    porTaller[te].push(v);
+  });
+
+  const filasDatos = [];
+  let totalCond = 0;
+
+  ORDEN_TALLERES_EXP.forEach(te => {
+    const tvales = porTaller[te] || [];
+    const bg = COLOR_TALLER[te] || "FFFFFFFF";
+    const textStyle = (bold=false) => ({
+      fill: { patternType: "solid", fgColor: { rgb: bg } },
+      font: { bold, color: { rgb: "FF000000" }, name: "Arial", sz: 9 },
+      alignment: { horizontal: "left", vertical: "center" },
+      border: {
+        top:    { style: "thin", color: { rgb: "FFB0B0B0" } },
+        bottom: { style: "thin", color: { rgb: "FFB0B0B0" } },
+        left:   { style: "thin", color: { rgb: "FFB0B0B0" } },
+        right:  { style: "thin", color: { rgb: "FFB0B0B0" } },
+      }
+    });
+
+    if (tvales.length === 0) {
+      // Fila vacía
+      const cols = [te, null, null, null, Number(uid), nombreCond, null, "SIN DESTINO", 0];
+      cols.forEach((val, c) => {
+        const addr = XLSX.utils.encode_cell({ r: R, c });
+        const s = textStyle(c === 0);
+        if (c === 8) { s.alignment = { horizontal: "right", vertical: "center" }; s.numFmt = "#,##0"; }
+        ws[addr] = val !== null
+          ? { v: val, t: typeof val === "number" ? "n" : "s", s }
+          : { v: "", t: "s", s };
+      });
+      filasDatos.push(R);
+      R++;
+    } else {
+      tvales.forEach(v => {
+        totalCond += Number(v.costoCond) || 0;
+        const nvale = v.nvale ? Number(v.nvale) : null;
+        const ot    = v.ordenServicio ? (isNaN(v.ordenServicio) ? v.ordenServicio : Number(v.ordenServicio)) : null;
+        const cols  = [
+          te, nvale, v.codigoDest || "", v.destinoNum ? Number(v.destinoNum) : null,
+          Number(uid), nombreCond, ot, v.destino || "", Number(v.costoCond) || 0
+        ];
+        cols.forEach((val, c) => {
+          const addr = XLSX.utils.encode_cell({ r: R, c });
+          const s = textStyle(c === 0);
+          if (c === 8) { s.alignment = { horizontal: "right", vertical: "center" }; }
+          ws[addr] = val !== null && val !== undefined
+            ? { v: val, t: typeof val === "number" ? "n" : "s", s }
+            : { v: "", t: "s", s };
+        });
+        filasDatos.push(R);
+        R++;
+      });
+    }
+  });
+
+  // Fila TOTAL
+  const addrLabel = XLSX.utils.encode_cell({ r: R, c: 7 });
+  const addrTotal = XLSX.utils.encode_cell({ r: R, c: 8 });
+  ws[addrLabel] = { v: "TOTAL A PAGAR:", t: "s", s: {
+    font: { bold: true, name: "Arial", sz: 10, color: { rgb: "FF1F4E79" } },
+    alignment: { horizontal: "right", vertical: "center" }
+  }};
+  ws[addrTotal] = { v: totalCond, t: "n", s: {
+    fill: { patternType: "solid", fgColor: { rgb: COLOR_TOTAL } },
+    font: { bold: true, name: "Arial", sz: 11, color: { rgb: "FF1F4E79" } },
+    alignment: { horizontal: "right", vertical: "center" },
+    numFmt: "#,##0",
+    border: { top:{style:"medium",color:{rgb:"FF1F4E79"}}, bottom:{style:"medium",color:{rgb:"FF1F4E79"}}, left:{style:"thin",color:{rgb:"FFB0B0B0"}}, right:{style:"medium",color:{rgb:"FF1F4E79"}} }
+  }};
+  R++;
+
+  // Rango de la hoja
+  ws["!ref"] = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:R-1,c:11} });
+
+  // Anchos de columna (en caracteres)
+  ws["!cols"] = [
+    {wch:16},{wch:10},{wch:12},{wch:8},{wch:8},{wch:14},{wch:13},{wch:44},{wch:10},{wch:2},{wch:10},{wch:14}
+  ];
+
+  // Alturas de fila
+  ws["!rows"] = [];
+  ws["!rows"][0] = { hpt: 18 };
+  ws["!rows"][1] = { hpt: 16 };
+  ws["!rows"][2] = { hpt: 24 };
+  filasDatos.forEach(r => { ws["!rows"][r] = { hpt: 15 }; });
+
+  return ws;
+}
+
+async function exportarPorConductor() {
+  const fecha = document.getElementById("exp-fecha")?.value || new Date().toISOString().slice(0,10);
+  if (!state.vales.length) { alert("No hay vales para exportar."); return; }
+  const btn = document.getElementById("btn-exp-conductor");
+  if (btn) { btn.textContent = "⏳ Generando..."; btn.disabled = true; }
+  try {
+    const XLSX = await cargarXLSX();
+    const porConductor = {};
+    state.vales.forEach(v => {
+      const uid = v.unidad || "0";
+      if (!porConductor[uid]) porConductor[uid] = [];
+      porConductor[uid].push(v);
+    });
+    Object.entries(porConductor).sort((a,b)=>Number(a[0])-Number(b[0])).forEach(([uid, vales]) => {
+      const wb = XLSX.utils.book_new();
+      const ws = crearHojaConductor(XLSX, uid, vales);
+      const nombre = vales[0].conductor.replace(/[^a-zA-Z0-9]/g,"_");
+      XLSX.utils.book_append_sheet(wb, ws, `U${uid} ${nombre}`.substring(0,31));
+      const buf = XLSX.write(wb, { bookType:"xlsx", type:"array", cellStyles:true });
+      const blob = new Blob([buf], { type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Perumotor_U${uid}_${nombre}_${fecha}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  } catch(e) { alert("Error al generar Excel: " + e.message); }
+  finally { if (btn) { btn.textContent = "👤 Exportar por Conductor (.xlsx)"; btn.disabled = false; } }
+}
+
+async function exportarTodos() {
+  const fecha = document.getElementById("exp-fecha")?.value || new Date().toISOString().slice(0,10);
+  if (!state.vales.length) { alert("No hay vales para exportar."); return; }
+  const btn = document.getElementById("btn-exp-todos");
+  if (btn) { btn.textContent = "⏳ Generando..."; btn.disabled = true; }
+  try {
+    const XLSX = await cargarXLSX();
+    const wb = XLSX.utils.book_new();
+    const porConductor = {};
+    state.vales.forEach(v => {
+      const uid = v.unidad || "0";
+      if (!porConductor[uid]) porConductor[uid] = [];
+      porConductor[uid].push(v);
+    });
+    Object.entries(porConductor).sort((a,b)=>Number(a[0])-Number(b[0])).forEach(([uid, vales]) => {
+      const ws = crearHojaConductor(XLSX, uid, vales);
+      const nombre = vales[0].conductor.replace(/[^a-zA-Z0-9]/g,"_");
+      XLSX.utils.book_append_sheet(wb, ws, `U${uid} ${nombre}`.substring(0,31));
+    });
+    const buf = XLSX.write(wb, { bookType:"xlsx", type:"array", cellStyles:true });
+    const blob = new Blob([buf], { type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = `Perumotor_TodosConductores_${fecha}.xlsx`; a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { alert("Error al generar Excel: " + e.message); }
+  finally { if (btn) { btn.textContent = "📊 Exportar TODOS (.xlsx)"; btn.disabled = false; } }
+}
+
+async function exportarTaller(taller) {
+  const fecha = document.getElementById("exp-fecha")?.value || new Date().toISOString().slice(0,10);
+  const valesFiltrados = state.vales.filter(v => v.taller === taller);
+  if (!valesFiltrados.length) { alert(`No hay vales para el taller: ${taller}`); return; }
+  try {
+    const XLSX = await cargarXLSX();
+    const wb = XLSX.utils.book_new();
+    const porConductor = {};
+    valesFiltrados.forEach(v => {
+      const uid = v.unidad || "0";
+      if (!porConductor[uid]) porConductor[uid] = [];
+      porConductor[uid].push(v);
+    });
+    Object.entries(porConductor).sort((a,b)=>Number(a[0])-Number(b[0])).forEach(([uid, vales]) => {
+      const ws = crearHojaConductor(XLSX, uid, vales);
+      const nombre = vales[0].conductor.replace(/[^a-zA-Z0-9]/g,"_");
+      XLSX.utils.book_append_sheet(wb, ws, `U${uid} ${nombre}`.substring(0,31));
+    });
+    const nombreT = taller.replace(/[^a-zA-Z0-9]/g,"_");
+    const buf = XLSX.write(wb, { bookType:"xlsx", type:"array", cellStyles:true });
+    const blob = new Blob([buf], { type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = `Perumotor_${nombreT}_${fecha}.xlsx`; a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { alert("Error al generar Excel: " + e.message); }
+}
+
+function limpiarTodos() {
+  if (!confirm("¿Borrar TODOS los vales? No se puede deshacer.")) return;
+  fetch(`${SB_URL}/rest/v1/vales?id=gte.0`, { method: "DELETE", headers: SB_HEADERS }).catch(()=>{});
+  state.vales = []; renderTab("exportar");
+}
+
+// ============================================================
+//  PANEL ADMINISTRADOR (Ángel, Augusto, Güisella)
+// ============================================================
+function buildAdminPanel() {
+  const movs = state.movimientos;
+  // Calcular totales
+  const totalDepositos = movs.filter(m=>m.tipo==="deposito").reduce((s,m)=>s+m.monto,0);
+  const totalAdelantos = movs.filter(m=>m.tipo==="adelanto").reduce((s,m)=>s+m.monto,0);
+  const totalGastos    = movs.filter(m=>m.tipo==="gasto").reduce((s,m)=>s+m.monto,0);
+  const saldo = totalDepositos - totalAdelantos - totalGastos;
+  const saldoClass = saldo > 0 ? "positivo" : saldo < 0 ? "negativo" : "neutro";
+  return `
+  <div class="saldo-box ${saldoClass}">
+    <div class="saldo-label">💰 Saldo Actual Cuenta</div>
+    <div class="saldo-val">S/ ${saldo.toFixed(2)}</div>
+    <div class="saldo-sub">Depósitos: S/${totalDepositos.toFixed(2)} · Adelantos: S/${totalAdelantos.toFixed(2)} · Gastos: S/${totalGastos.toFixed(2)}</div>
+  </div>
+
+  <div class="admin-grid">
+    <!-- Registrar ingreso/depósito -->
+    <div class="card">
+      <div class="card-title">🏦 Registrar Depósito Recibido</div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Monto depositado (S/)</label>
+        <input type="number" id="dep-monto" placeholder="0.00" step="0.01" min="0">
+      </div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Fecha del depósito</label>
+        <input type="date" id="dep-fecha" value="${new Date().toISOString().slice(0,10)}">
+      </div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Descripción / Referencia</label>
+        <input type="text" id="dep-desc" placeholder="Ej: Depósito Perumotor semana 1">
+      </div>
+      <button class="btn btn-green btn-full" onclick="registrarMovimiento('deposito')">✅ Registrar Depósito</button>
+    </div>
+
+    <!-- Adelanto a conductor -->
+    <div class="card">
+      <div class="card-title">🚗 Adelanto a Conductor</div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Conductor</label>
+        <select id="adel-cond" onchange="calcularAdelantoConductor()">
+          <option value="">— seleccionar conductor —</option>
+          ${CONDUCTORES.map(c=>`<option value="${c.nombre}">${c.nombre} · U${c.id}</option>`).join("")}
+        </select>
+      </div>
+
+      <!-- Resumen de vales y periodo de pago -->
+      <div id="adel-resumen" style="display:none;margin-bottom:12px">
+        <div style="background:var(--bg);border-radius:10px;padding:12px;border:1.5px solid var(--border)">
+          <div style="font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">📊 Resumen del conductor</div>
+          <div id="adel-periodos" style="font-size:12px;color:var(--text-2)"></div>
+        </div>
+      </div>
+
+      <div class="fld" style="margin-bottom:10px">
+        <label>Monto adelanto (S/) <span id="adel-monto-sugerido" style="color:var(--green);font-size:11px;font-weight:700"></span></label>
+        <input type="number" id="adel-monto" placeholder="0.00" step="0.01" min="0">
+      </div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Periodo que cubre</label>
+        <select id="adel-periodo">
+          <option value="">— seleccionar periodo —</option>
+          <option value="15-25 (pago el 30)">Vales del 15 al 25 — Pago el día 30</option>
+          <option value="26-5 (pago el 10)">Vales del 26 al 5 — Pago el día 10</option>
+          <option value="6-15 (pago el 20)">Vales del 6 al 15 — Pago el día 20</option>
+        </select>
+      </div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Fecha</label>
+        <input type="date" id="adel-fecha" value="${new Date().toISOString().slice(0,10)}">
+      </div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Nota</label>
+        <input type="text" id="adel-nota" placeholder="Motivo del adelanto...">
+      </div>
+      <button class="btn btn-amber btn-full" onclick="registrarMovimiento('adelanto')">📤 Registrar Adelanto</button>
+    </div>
+
+    <!-- Gasto tienda/reunión -->
+    <div class="card">
+      <div class="card-title">🛒 Gasto Tienda / Reunión</div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Monto del gasto (S/)</label>
+        <input type="number" id="gast-monto" placeholder="0.00" step="0.01" min="0">
+      </div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Fecha</label>
+        <input type="date" id="gast-fecha" value="${new Date().toISOString().slice(0,10)}">
+      </div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Descripción del gasto</label>
+        <input type="text" id="gast-desc" placeholder="Ej: Compras reunión, anotado tienda...">
+      </div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Responsable / Tienda</label>
+        <input type="text" id="gast-resp" placeholder="Ej: tienda de Cristian, reunión...">
+      </div>
+      <button class="btn btn-red btn-full" onclick="registrarMovimiento('gasto')">🧾 Registrar Gasto</button>
+    </div>
+  </div>
+
+  <div id="admin-msg" style="font-size:13px;text-align:center;margin-bottom:12px;min-height:20px"></div>
+
+  <!-- Historial de movimientos -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin:0">📜 Historial de Movimientos</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px" onclick="exportarMovimientos()">⬇️ Exportar CSV</button>
+        <button class="btn" style="font-size:12px;padding:7px 12px;color:var(--red)" onclick="limpiarMovimiento()">🗑️ Limpiar</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <select id="filtro-tipo" onchange="renderHistorial()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg)">
+        <option value="">Todos los tipos</option>
+        <option value="deposito">Solo depósitos</option>
+        <option value="adelanto">Solo adelantos</option>
+        <option value="gasto">Solo gastos</option>
+      </select>
+      <input id="filtro-bus" placeholder="Buscar..." oninput="renderHistorial()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg);flex:1;min-width:120px">
+    </div>
+    <div id="historial-movimientos">${renderHistorialHTML(movs)}</div>
+  </div>
+
+  <!-- Estado de sincronización Supabase -->
+  <div class="card" style="border:1.5px solid var(--blue)">
+    <div class="card-title" style="color:var(--blue)">☁️ Base de Datos — Supabase</div>
+    <div class="alert alert-blue" style="margin-bottom:0">
+      ✅ Todos los dispositivos comparten la misma base de datos en tiempo real.<br>
+      Proyecto: <strong>trebolsuraqp</strong> · Los datos se guardan automáticamente al registrar cada vale o movimiento.
+    </div>
+  </div>`;
+}
+
+// ============================================================
+//  LÓGICA DE ADELANTOS — PERIODOS DE PAGO
+//  Periodos: 15-25 cierre 25 → paga el 30
+//            26-5  cierre 5  → paga el 10
+//            6-15  cierre 15 → paga el 20
+// ============================================================
+function calcularAdelantoConductor() {
+  const conductor = document.getElementById("adel-cond")?.value;
+  const resumenEl = document.getElementById("adel-resumen");
+  const periodosEl = document.getElementById("adel-periodos");
+  const sugeridoEl = document.getElementById("adel-monto-sugerido");
+  if (!conductor || !resumenEl) return;
+
+  const valesCond = state.vales.filter(v => v.conductor === conductor);
+  const adelantosCond = state.movimientos.filter(m => m.tipo === "adelanto" && m.extra === conductor);
+
+  if (!valesCond.length) {
+    resumenEl.style.display = "block";
+    periodosEl.innerHTML = `<span style="color:var(--text-3)">Este conductor no tiene vales registrados aún.</span>`;
+    if (sugeridoEl) sugeridoEl.textContent = "";
+    return;
+  }
+
+  // Función para determinar en qué periodo cae una fecha
+  function periodoDeVale(fechaStr) {
+    // fechaStr viene como "DD/MM/YYYY"
+    const parts = fechaStr.split("/");
+    if (parts.length < 3) return null;
+    const dia = parseInt(parts[0]);
+    if (dia >= 15 && dia <= 25) return "15-25 (pago el 30)";
+    if (dia >= 26 || dia <= 5)  return "26-5 (pago el 10)";
+    if (dia >= 6  && dia <= 15) return "6-15 (pago el 20)"; // nota: dia 15 puede solapar, prioridad arriba
+    return "otro";
+  }
+
+  // Agrupar vales por periodo
+  const periodos = {
+    "15-25 (pago el 30)": { label: "Del 15 al 25 → se paga el día 30", vales: [], total: 0 },
+    "26-5 (pago el 10)":  { label: "Del 26 al 5  → se paga el día 10", vales: [], total: 0 },
+    "6-15 (pago el 20)":  { label: "Del 6 al 15  → se paga el día 20", vales: [], total: 0 },
+  };
+  valesCond.forEach(v => {
+    const p = periodoDeVale(v.fecha);
+    if (p && periodos[p]) { periodos[p].vales.push(v); periodos[p].total += v.costoCond; }
+  });
+
+  // Calcular adelantos ya dados por periodo
+  const adelantoPorPeriodo = {};
+  adelantosCond.forEach(m => {
+    const p = m.periodo || "";
+    adelantoPorPeriodo[p] = (adelantoPorPeriodo[p] || 0) + m.monto;
+  });
+
+  const totalVales = valesCond.reduce((s,v) => s + v.costoCond, 0);
+  const totalAdelantado = adelantosCond.reduce((s,m) => s + m.monto, 0);
+  const saldoPendiente = totalVales - totalAdelantado;
+
+  let html = `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+    <strong>Total vales:</strong> S/ ${totalVales.toFixed(2)} &nbsp;·&nbsp;
+    <strong>Adelantado:</strong> <span style="color:var(--red)">S/ ${totalAdelantado.toFixed(2)}</span> &nbsp;·&nbsp;
+    <strong>Por pagar:</strong> <span style="color:var(--green)">S/ ${saldoPendiente.toFixed(2)}</span>
+  </div>`;
+
+  Object.entries(periodos).forEach(([key, p]) => {
+    if (!p.vales.length) return;
+    const yaAdelantado = adelantoPorPeriodo[key] || 0;
+    const porPagar = p.total - yaAdelantado;
+    html += `<div style="margin-bottom:6px;padding:6px 8px;border-radius:6px;background:#fff;border:1px solid var(--border)">
+      <div style="font-weight:700;color:var(--dark)">${p.label}</div>
+      <div style="color:var(--text-2)">
+        ${p.vales.length} vale(s) · Total: <strong>S/ ${p.total.toFixed(2)}</strong>
+        ${yaAdelantado > 0 ? ` · Adelantado: <span style="color:var(--red)">S/ ${yaAdelantado.toFixed(2)}</span>` : ""}
+        · <span style="color:${porPagar>0?"var(--green)":"var(--text-3)"}">Por cobrar: S/ ${porPagar.toFixed(2)}</span>
+      </div>
+    </div>`;
+  });
+
+  resumenEl.style.display = "block";
+  periodosEl.innerHTML = html;
+  if (sugeridoEl) sugeridoEl.textContent = saldoPendiente > 0 ? `(sugerido: S/ ${saldoPendiente.toFixed(2)})` : "(ya cobrado todo)";
+}
+
+function registrarMovimiento(tipo) {
+  let monto, fecha, desc, extra = "", extra2 = "";
+  const msg = document.getElementById("admin-msg");
+  if (tipo === "deposito") {
+    monto = parseFloat(document.getElementById("dep-monto").value);
+    fecha = document.getElementById("dep-fecha").value;
+    desc  = document.getElementById("dep-desc").value.trim();
+  } else if (tipo === "adelanto") {
+    monto = parseFloat(document.getElementById("adel-monto").value);
+    fecha = document.getElementById("adel-fecha").value;
+    desc  = document.getElementById("adel-nota").value.trim();
+    extra = document.getElementById("adel-cond").value;
+    if (!extra) { msg.textContent = "⚠️ Selecciona el conductor"; msg.style.color="var(--red)"; return; }
+    const periodoEl = document.getElementById("adel-periodo");
+    extra2 = periodoEl ? periodoEl.value : "";
+  } else if (tipo === "gasto") {
+    monto = parseFloat(document.getElementById("gast-monto").value);
+    fecha = document.getElementById("gast-fecha").value;
+    desc  = document.getElementById("gast-desc").value.trim();
+    extra = document.getElementById("gast-resp").value.trim();
+  }
+  if (!monto || monto <= 0) { msg.textContent = "⚠️ Ingresa un monto válido"; msg.style.color="var(--red)"; return; }
+  if (!fecha) { msg.textContent = "⚠️ Selecciona la fecha"; msg.style.color="var(--red)"; return; }
+  const mov = {
+    id: Date.now(), tipo, monto, fecha, desc,
+    extra, periodo: extra2, registradoPor: state.usuario,
+    horaReg: new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})
+  };
+  state.movimientos.push(mov);
+  // Guardar en Supabase directamente
+  guardarMovimientoNube(mov).then(() => {
+    showSyncToast("✅ Guardado en la nube", "#1e8c45");
+  }).catch(() => {
+    showSyncToast("⚠️ Sin conexión — guardado local", "#e8a500");
+  });
+  // Limpiar formulario
+  const labels = {deposito:["dep-monto","dep-desc"], adelanto:["adel-monto","adel-nota"], gasto:["gast-monto","gast-desc","gast-resp"]};
+  (labels[tipo]||[]).forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+  if (tipo==="adelanto") {
+    document.getElementById("adel-cond").value="";
+    const pel = document.getElementById("adel-periodo"); if(pel) pel.value="";
+    const rel = document.getElementById("adel-resumen"); if(rel) rel.style.display="none";
+    const sel = document.getElementById("adel-monto-sugerido"); if(sel) sel.textContent="";
+  }
+  const etiquetas = {deposito:"Depósito", adelanto:"Adelanto", gasto:"Gasto"};
+  msg.textContent = `✅ ${etiquetas[tipo]} de S/ ${monto.toFixed(2)} registrado`;
+  msg.style.color = "var(--green)";
+  // Re-render panel
+  renderTab("admin-panel");
+}
+
+function renderHistorial() {
+  const tipo = document.getElementById("filtro-tipo")?.value || "";
+  const bus  = (document.getElementById("filtro-bus")?.value || "").toLowerCase();
+  let movs = state.movimientos;
+  if (tipo) movs = movs.filter(m=>m.tipo===tipo);
+  if (bus)  movs = movs.filter(m=>
+    (m.desc||"").toLowerCase().includes(bus) ||
+    (m.extra||"").toLowerCase().includes(bus) ||
+    String(m.monto).includes(bus)
+  );
+  const el = document.getElementById("historial-movimientos");
+  if (el) el.innerHTML = renderHistorialHTML(movs);
+}
+
+function renderHistorialHTML(movs) {
+  if (!movs.length) return `<div class="empty-state" style="padding:24px"><div class="icon" style="font-size:32px">📭</div><p>Sin movimientos registrados aún.</p></div>`;
+  const tipoChip = {deposito:"chip-deposito", adelanto:"chip-adelanto", gasto:"chip-gasto"};
+  const tipoLabel = {deposito:"Depósito", adelanto:"Adelanto", gasto:"Gasto"};
+  const tipoIcono = {deposito:"🏦", adelanto:"🚗", gasto:"🛒"};
+  return movs.slice().reverse().map(m => {
+    const colorMonto = m.tipo==="deposito" ? "monto-positivo" : m.tipo==="adelanto" ? "monto-negativo" : "monto-negativo";
+    const signo = m.tipo==="deposito" ? "+" : "-";
+    return `<div class="movimiento-row">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="${tipoChip[m.tipo]}">${tipoIcono[m.tipo]} ${tipoLabel[m.tipo]}</span>
+          ${m.extra?`<span style="font-size:12px;color:var(--text-2)">${m.extra}</span>`:""}
+          ${m.periodo?`<span style="font-size:11px;background:#ede9fe;color:#5b21b6;padding:1px 6px;border-radius:4px;font-weight:700">${m.periodo}</span>`:""}
+        </div>
+        <div style="font-size:12px;color:var(--text-2);margin-top:3px">${m.desc||"—"}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px">${m.fecha} · Registrado por: ${m.registradoPor}</div>
+      </div>
+      <div class="mono ${colorMonto}" style="font-size:16px;white-space:nowrap">${signo}S/ ${m.monto.toFixed(2)}</div>
+    </div>`;
+  }).join("");
+}
+
+function exportarMovimientos() {
+  if (!state.movimientos.length) { alert("No hay movimientos para exportar."); return; }
+  const headers = ["Tipo","Monto","Fecha","Descripcion","Extra","Registrado Por","Hora Registro"];
+  const rows = state.movimientos.map(m => [
+    m.tipo, m.monto.toFixed(2), m.fecha, `"${m.desc||""}"`, `"${m.extra||""}"`, m.registradoPor, m.horaReg
+  ]);
+  const fecha = new Date().toISOString().slice(0,10);
+  const csv = [headers.join(","), ...rows.map(r=>r.join(","))].join("\n");
+  const blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `Trebol_Sur_Caja_${fecha}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+
+function limpiarMovimiento() {
+  if (!confirm("¿Borrar TODOS los movimientos? Esta acción no se puede deshacer.")) return;
+  fetch(`${SB_URL}/rest/v1/movimientos?id=gte.0`, { method: "DELETE", headers: SB_HEADERS }).catch(()=>{});
+  state.movimientos = []; renderTab("admin-panel");
+}
+
+function copiarBinId() {
+  const id = _binId;
+  if (!id) { alert("Aún no hay BIN ID. Guarda un vale primero para crearlo."); return; }
+  navigator.clipboard.writeText(id).then(() => {
+    const el = document.getElementById("bin-copy-msg");
+    if (el) { el.textContent = "✅ BIN ID copiado al portapapeles. Pégalo en JBIN_ID_FIJO del código."; setTimeout(()=>{el.textContent="";},4000); }
+  }).catch(() => {
+    prompt("Copia este BIN ID manualmente:", id);
+  });
+}
+
+// ============================================================
+//  WALKIE TALKIE
+// ============================================================
+// ============================================================
+//  GESTIÓN DE CONTRASEÑAS (solo moderador)
+// ============================================================
+
+// Las contraseñas se guardan también en localStorage para
+// permitir cambiarlas sin editar el código fuente.
+// Al iniciar, si hay contraseñas guardadas localmente se usan
+// en lugar de las del código.
+function cargarPassLocal() {
+  try {
+    const d = localStorage.getItem("trebol_passwords_v1");
+    if (!d) return;
+    const saved = JSON.parse(d);
+    // Aplicar a conductores
+    CONDUCTORES.forEach(c => {
+      if (saved["c_"+c.id]) c.pass = saved["c_"+c.id];
+    });
+    // Aplicar a admins
+    ADMINS.forEach(a => {
+      if (saved["a_"+a.id]) a.pass = saved["a_"+a.id];
+    });
+  } catch(e) {}
+}
+function guardarPassLocal() {
+  const d = {};
+  CONDUCTORES.forEach(c => { d["c_"+c.id] = c.pass; });
+  ADMINS.forEach(a => { d["a_"+a.id] = a.pass; });
+  try { localStorage.setItem("trebol_passwords_v1", JSON.stringify(d)); } catch(e) {}
+}
+
+function buildContrasenas() {
+  return `
+  <div class="card">
+    <div class="section-title">🔑 Gestión de Contraseñas</div>
+    <div class="alert alert-amber" style="margin-bottom:16px">
+      ⚠️ Las contraseñas <strong>deben ser el DNI o N° Carnet de extranjería</strong> de cada persona.<br>
+      Los cambios se guardan automáticamente en este dispositivo. Para que funcionen en <strong>todos los dispositivos</strong>, 
+      después de guardar descarga el archivo actualizado con el botón de abajo.
+    </div>
+
+    <div class="card-title">🚗 Conductores</div>
+    <div class="table-wrap" style="margin-bottom:24px">
+      <table>
+        <thead><tr>
+          <th>Unidad</th><th>Nombre</th><th>Contraseña actual</th>
+          <th>Nueva contraseña (DNI)</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${CONDUCTORES.map(c => `
+          <tr>
+            <td><strong>U${c.id}</strong></td>
+            <td>${c.nombre}</td>
+            <td>
+              <span id="pass-vis-c${c.id}" style="font-family:monospace;letter-spacing:2px">••••••••</span>
+              <button onclick="toggleVer('c${c.id}')" style="border:none;background:none;cursor:pointer;font-size:13px;margin-left:6px">👁️</button>
+            </td>
+            <td>
+              <input id="new-pass-c${c.id}" type="text" placeholder="Ingresa DNI o Carnet"
+                style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:monospace;width:100%"
+                oninput="validarDNI(this)">
+              <div id="dni-msg-c${c.id}" style="font-size:11px;margin-top:3px"></div>
+            </td>
+            <td>
+              <button class="btn btn-primary" style="padding:7px 14px;font-size:12px"
+                onclick="cambiarPass('conductor', ${c.id})">Guardar</button>
+            </td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-title">💼 Administradores</div>
+    <div class="table-wrap" style="margin-bottom:24px">
+      <table>
+        <thead><tr>
+          <th>Nombre</th><th>Contraseña actual</th>
+          <th>Nueva contraseña (DNI)</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${ADMINS.map(a => `
+          <tr>
+            <td><strong>${a.nombre}</strong></td>
+            <td>
+              <span id="pass-vis-a${a.id}" style="font-family:monospace;letter-spacing:2px">••••••••</span>
+              <button onclick="toggleVer('a${a.id}')" style="border:none;background:none;cursor:pointer;font-size:13px;margin-left:6px">👁️</button>
+            </td>
+            <td>
+              <input id="new-pass-a${a.id}" type="text" placeholder="Ingresa DNI o Carnet"
+                style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:monospace;width:100%"
+                oninput="validarDNI(this)">
+              <div id="dni-msg-a${a.id}" style="font-size:11px;margin-top:3px"></div>
+            </td>
+            <td>
+              <button class="btn btn-amber" style="padding:7px 14px;font-size:12px"
+                onclick="cambiarPass('admin', '${a.id}')">Guardar</button>
+            </td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <div id="pass-global-msg" style="font-size:14px;text-align:center;min-height:22px;margin-bottom:12px;font-weight:600"></div>
+
+    <div class="alert alert-blue">
+      📥 <strong>Para que los cambios funcionen en TODOS los dispositivos</strong> (todos los celulares de los conductores),
+      debes pedirle al programador que actualice el archivo HTML con los nuevos DNIs, o usar la exportación de contraseñas:
+      <button class="btn btn-primary" style="margin-top:10px;width:100%" onclick="exportarPassComoTexto()">
+        📋 Ver todas las contraseñas para actualizar el archivo
+      </button>
+    </div>
+  </div>`;
+}
+
+// Mapa para recordar si está visible o no
+const _passVisible = {};
+function toggleVer(key) {
+  _passVisible[key] = !_passVisible[key];
+  const el = document.getElementById("pass-vis-"+key);
+  if (!el) return;
+  // Buscar pass real
+  let pass = "——";
+  if (key.startsWith("c")) {
+    const id = parseInt(key.slice(1));
+    const c = CONDUCTORES.find(x => x.id === id);
+    if (c) pass = c.pass;
+  } else {
+    const id = key.slice(1);
+    const a = ADMINS.find(x => x.id === id);
+    if (a) pass = a.pass;
+  }
+  el.textContent = _passVisible[key] ? pass : "••••••••";
+}
+
+function validarDNI(input) {
+  const v = input.value.trim();
+  const id = input.id.replace("new-pass-","");
+  const msgEl = document.getElementById("dni-msg-"+id);
+  if (!msgEl) return;
+  if (!v) { msgEl.textContent = ""; return; }
+  const soloNumeros = /^\d+$/.test(v);
+  const esCarnet = /^CE\d+$/i.test(v);
+  if (v.length === 8 && soloNumeros) {
+    msgEl.textContent = "✅ DNI válido (8 dígitos)";
+    msgEl.style.color = "var(--green)";
+  } else if (esCarnet) {
+    msgEl.textContent = "✅ Carnet de extranjería";
+    msgEl.style.color = "var(--green)";
+  } else if (v.length > 0 && v.length < 8 && soloNumeros) {
+    msgEl.textContent = `⚠️ DNI debe tener 8 dígitos (tienes ${v.length})`;
+    msgEl.style.color = "var(--amber)";
+  } else {
+    msgEl.textContent = "ℹ️ Para carnet escribe CE seguido de los números (ej: CE012345)";
+    msgEl.style.color = "var(--text-3)";
+  }
+}
+
+function cambiarPass(tipo, id) {
+  const key = tipo === "conductor" ? `c${id}` : `a${id}`;
+  const input = document.getElementById(`new-pass-${key}`);
+  const msgEl = document.getElementById(`dni-msg-${key}`);
+  const globalMsg = document.getElementById("pass-global-msg");
+  if (!input) return;
+  const nueva = input.value.trim();
+  if (!nueva) { if(msgEl) { msgEl.textContent = "⚠️ Ingresa el DNI primero"; msgEl.style.color="var(--red)"; } return; }
+  // Validación mínima
+  const soloNum = /^\d+$/.test(nueva);
+  const esCarnet = /^CE\d+$/i.test(nueva);
+  if (!soloNum && !esCarnet) {
+    if(msgEl) { msgEl.textContent = "❌ Solo DNI (8 números) o Carnet (CE + números)"; msgEl.style.color="var(--red)"; }
+    return;
+  }
+  // Aplicar cambio
+  if (tipo === "conductor") {
+    const c = CONDUCTORES.find(x => x.id === id);
+    if (c) { c.pass = nueva; }
+    // Si este conductor también es admin, sincronizar
+    const adminSync = ADMINS.find(a => {
+      if (id===5 && a.id==="augusto") return true;
+      if (id===6 && a.id==="guisella") return true;
+      if (id===7 && a.id==="angel") return true;
+      return false;
+    });
+    if (adminSync) adminSync.pass = nueva;
+  } else {
+    const a = ADMINS.find(x => x.id === id);
+    if (a) { a.pass = nueva; }
+    // Sincronizar con conductor si aplica
+    const unitMap = {"augusto":5,"guisella":6,"angel":7};
+    const uid = unitMap[id];
+    if (uid) {
+      const c = CONDUCTORES.find(x => x.id === uid);
+      if (c) c.pass = nueva;
+    }
+  }
+  guardarPassLocal();
+  input.value = "";
+  if(msgEl) { msgEl.textContent = ""; }
+  // Actualizar visualizador si estaba visible
+  if (_passVisible[key]) { toggleVer(key); toggleVer(key); }
+  globalMsg.textContent = `✅ Contraseña actualizada correctamente`;
+  globalMsg.style.color = "var(--green)";
+  setTimeout(() => { globalMsg.textContent = ""; }, 4000);
+}
+
+function exportarPassComoTexto() {
+  let txt = "=== CONTRASEÑAS TRÉBOL SUR SAC ===\n";
+  txt += `Exportado: ${new Date().toLocaleString("es-PE")}\n\n`;
+  txt += "--- CONDUCTORES ---\n";
+  CONDUCTORES.forEach(c => {
+    txt += `  { id:${c.id},  nombre:"${c.nombre}", pass:"${c.pass}" },\n`;
+  });
+  txt += "\n--- ADMINISTRADORES ---\n";
+  ADMINS.forEach(a => {
+    txt += `  { id:"${a.id}", nombre:"${a.nombre}", pass:"${a.pass}" },\n`;
+  });
+  txt += "\nCopia y pega esto en el archivo HTML reemplazando la sección CONDUCTORES y ADMINS.";
+  const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Trebol_Sur_Passwords_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+let wtState = {
+  canal:"CH1", stream:null, mediaRecorder:null, isTransmitting:false,
+  peer:null, connections:[], msgs:[], audioCtx:null, analyser:null, animFrame:null, bc:null,
+};
+const CANALES = ["CH1","CH2","CH3"];
+function buildWalkie() {
+  return `
+  <div class="wt-wrap">
+    <div class="wt-device">
+      <div class="wt-screen">
+        <div class="wt-channel" id="wt-ch-label">CANAL: ${wtState.canal}</div>
+        <div class="wt-status" id="wt-status">Iniciando...</div>
+        <div class="wt-user" id="wt-user-label">${state.usuario} · ${state.unidad?"U"+state.unidad:"Admin"}</div>
+      </div>
+      <div id="wt-msgs" class="wt-msgs"><div style="color:#555;font-size:11px;text-align:center">Sin mensajes aún</div></div>
+      <div class="wt-visualizer" id="wt-viz">
+        ${Array(16).fill(0).map((_,i)=>`<div class="wt-bar" id="wt-bar-${i}" style="height:4px"></div>`).join("")}
+      </div>
+      <div class="wt-channel-select">
+        ${CANALES.map(c=>`<div class="ch-btn${c===wtState.canal?" active":""}" onclick="cambiarCanal('${c}')">${c}</div>`).join("")}
+      </div>
+      <button class="ptt-btn" id="ptt-btn"
+        onmousedown="startTX()" onmouseup="stopTX()"
+        ontouchstart="startTX(event)" ontouchend="stopTX(event)">
+        🎙️ Mantén para hablar
+      </button>
+      <div class="wt-info" id="wt-info">Toca y mantén el botón para transmitir</div>
+    </div>
+    <div style="font-size:12px;color:var(--text-3);text-align:center;max-width:340px">
+      📡 La radio funciona entre dispositivos en la misma red.<br>
+      <strong>Mismo dispositivo:</strong> abre en dos pestañas para probar.
+    </div>
+  </div>`;
+}
+async function initWalkie() {
+  setWtStatus("Solicitando micrófono...");
+  try {
+    wtState.stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    setWtStatus(`Listo · ${wtState.canal}`);
+    setupAudioVisualizer();
+  } catch(e) {
+    setWtStatus("⚠️ Sin micrófono");
+    const btn = document.getElementById("ptt-btn");
+    if (btn) btn.disabled = true;
+    const inf = document.getElementById("wt-info");
+    if (inf) inf.textContent = "Activa el permiso de micrófono en tu navegador";
+  }
+  try {
+    wtState.bc = new BroadcastChannel(`trebol_walkie_${wtState.canal}`);
+    wtState.bc.onmessage = (e) => {
+      if (e.data.tipo === "audio") playAudio(e.data.audioB64, e.data.from);
+      if (e.data.tipo === "msg")   addWtMsg(e.data.from, e.data.texto, false);
+    };
+  } catch(e) {}
+}
+function cambiarCanal(c) {
+  wtState.canal = c;
+  document.querySelectorAll(".ch-btn").forEach(b => b.classList.toggle("active", b.textContent === c));
+  document.getElementById("wt-ch-label").textContent = `CANAL: ${c}`;
+  setWtStatus(`Listo · ${c}`);
+  if (wtState.bc) { wtState.bc.close(); }
+  try {
+    wtState.bc = new BroadcastChannel(`trebol_walkie_${c}`);
+    wtState.bc.onmessage = (e) => {
+      if (e.data.tipo === "audio") playAudio(e.data.audioB64, e.data.from);
+      if (e.data.tipo === "msg")   addWtMsg(e.data.from, e.data.texto, false);
+    };
+  } catch(e) {}
+}
+function setupAudioVisualizer() {
+  try {
+    wtState.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = wtState.audioCtx.createMediaStreamSource(wtState.stream);
+    wtState.analyser = wtState.audioCtx.createAnalyser();
+    wtState.analyser.fftSize = 64;
+    src.connect(wtState.analyser);
+    animViz();
+  } catch(e) {}
+}
+function animViz() {
+  if (!wtState.analyser) return;
+  const data = new Uint8Array(wtState.analyser.frequencyBinCount);
+  wtState.analyser.getByteFrequencyData(data);
+  for (let i = 0; i < 16; i++) {
+    const bar = document.getElementById(`wt-bar-${i}`);
+    if (bar) {
+      const h = wtState.isTransmitting ? Math.max(4, (data[i*2]||0) / 255 * 44) : 4;
+      bar.style.height = h + "px";
+      bar.style.background = wtState.isTransmitting ? "#4ade80" : "#2a4a2e";
+    }
+  }
+  wtState.animFrame = requestAnimationFrame(animViz);
+}
+function startTX(e) {
+  if (e && e.cancelable) e.preventDefault();
+  if (!wtState.stream || wtState.isTransmitting) return;
+  wtState.isTransmitting = true;
+  document.getElementById("ptt-btn").classList.add("transmitting");
+  setWtStatus("🔴 TRANSMITIENDO...");
+  document.getElementById("wt-info").textContent = "Suelta para dejar de transmitir";
+  const chunks = [];
+  let mimeType = "audio/webm";
+  if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = "audio/ogg;codecs=opus";
+  if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = "";
+  const opts = mimeType ? {mimeType} : {};
+  try { wtState.mediaRecorder = new MediaRecorder(wtState.stream, opts); }
+  catch(e) { wtState.mediaRecorder = new MediaRecorder(wtState.stream); }
+  wtState.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+  wtState.mediaRecorder.onstop = () => {
+    const blob = new Blob(chunks, {type: wtState.mediaRecorder.mimeType || "audio/webm"});
+    const reader = new FileReader();
+    reader.onload = () => {
+      const b64 = reader.result.split(",")[1];
+      if (wtState.bc) wtState.bc.postMessage({ tipo:"audio", audioB64: b64, from: state.usuario, mimeType: blob.type });
+    };
+    reader.readAsDataURL(blob);
+  };
+  wtState.mediaRecorder.start();
+}
+function stopTX(e) {
+  if (e && e.cancelable) e.preventDefault();
+  if (!wtState.isTransmitting) return;
+  wtState.isTransmitting = false;
+  document.getElementById("ptt-btn").classList.remove("transmitting");
+  setWtStatus(`Listo · ${wtState.canal}`);
+  document.getElementById("wt-info").textContent = "Toca y mantén el botón para transmitir";
+  if (wtState.mediaRecorder && wtState.mediaRecorder.state !== "inactive") wtState.mediaRecorder.stop();
+  addWtMsg(state.usuario, "🎙️ Mensaje de voz enviado", true);
+}
+function playAudio(b64, from) {
+  try {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+    const blob = new Blob([arr], {type:"audio/webm"});
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.play().catch(()=>{});
+    addWtMsg(from, "🔊 Recibido", false);
+    URL.revokeObjectURL(url);
+  } catch(e) {}
+}
+function addWtMsg(from, texto, propio) {
+  wtState.msgs.push({from, texto, propio, t: new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})});
+  if (wtState.msgs.length > 50) wtState.msgs.shift();
+  const el = document.getElementById("wt-msgs");
+  if (!el) return;
+  el.innerHTML = wtState.msgs.map(m =>
+    `<div class="wt-msg${m.propio?" own":""}">
+      <span class="wt-from">${m.from}</span>
+      <span>${m.texto}</span>
+      <span style="color:#555;margin-left:auto;font-size:10px">${m.t}</span>
+    </div>`
+  ).join("");
+  el.scrollTop = el.scrollHeight;
+}
+function setWtStatus(s) { const el=document.getElementById("wt-status"); if(el) el.textContent=s; }
+function wtCleanup() {
+  if (wtState.animFrame) cancelAnimationFrame(wtState.animFrame);
+  if (wtState.stream) wtState.stream.getTracks().forEach(t => t.stop());
+  if (wtState.bc) wtState.bc.close();
+  if (wtState.audioCtx) wtState.audioCtx.close();
+  wtState.stream=null; wtState.bc=null; wtState.audioCtx=null; wtState.isTransmitting=false; wtState.msgs=[];
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+cargarPassLocal(); // cargar contraseñas guardadas localmente
+selectRol("conductor");
+poblarNombres();
+</script>
+</body>
+</html>
